@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>tagging tool</title>
+		<style type="text/css" media="screen">
+			#tag_box * {
+				margin: 0;
+				padding: 0;
+				outline: none;
+			}
+			
+			#tag_box .contents {
+				border: 1px solid #000;
+				margin: 10px;
+				min-height: 60px;
+				cursor: text;
+			}
+			
+			#tag_box span.tag {
+				display: inline-block;
+			}
+			#tag_box span.tag label {
+				background: #656696;
+				-webkit-border-radius: 5px;
+				-moz-border-radius: 5px;
+				margin: 3px 0 3px 5px;
+				position: relative;
+				display: inline-block;
+				min-width: 20px;
+				min-height: 20px;
+			}
+			#tag_box span.tag input {
+				border: none;
+				background: transparent;
+				color: #fff;
+				position: absolute;
+				left:0;
+				padding-top: 3px;
+				width: 100%;
+				height: 100%;
+				z-index: 9999;
+/*				line-height: 20px;*/
+				text-align: center
+			}
+			span.tag input, span.tag label span {
+				font-family: helvetica;
+				font-size: 12px;
+			}
+			#tag_box span.tag label span {
+				display: inline-block;
+				visibility: hidden;
+				margin-left: 5px;
+
+			}
+			.example {
+				display: none !important;
+			}
+		</style>
+		<script src="http://www.google.com/jsapi"></script>
+		<script>
+		  // Load 
+		  google.load("jquery", "1");
+		  google.setOnLoadCallback(function() {
+				$(".contents").click(function(e) {
+					if($(e.target).is('.contents')){
+						$(this).append(new_tag()).find('.tag:last input').focus();
+					}
+					
+				})
+				var blur_tag = function(e) {
+					if (!$.trim($(this).val())) {
+						setTimeout(function() {
+							$(e.target).closest('.tag').remove();
+						}, 200);
+					};
+				}
+				var	new_tag = function(focus) {
+					return $('.tag.example').clone(true).removeClass('example').find('input').blur(blur_tag).end();
+				}
+				$('.tag input').live('keydown',function(e) {
+					console.info(e.keyCode);
+					if(e.keyCode == 188){
+						e.preventDefault();
+					}
+					if(e.keyCode==9 || e.which == 9 || e.keyCode == 188){ // if TAB
+						if (!e.shiftKey && $.trim($(this).val())) {
+									var tag = $(this).closest('.tag').after(new_tag());
+									setTimeout(function() {
+										tag.next('.tag').find('input').focus();
+									}, 100);
+									return false;
+							}
+						}	
+				})
+				$('.tag input').live('keyup',function(e) {
+					
+					$(this).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
+					
+				}).keyup();
+				
+				$('span.tag').live('click',function(e) {
+					e.stopPropagation();
+
+					var target = $(e.target);
+					if (target.is('span.tag')) {
+						target.before(new_tag());
+						target.prev('.tag').find(':input').focus();
+					};
+				})
+				$(".contents").click();
+			})
+		</script>
+	</head>
+	<body>
+		<h1>Tagging tool</h1>
+		
+		<div id="tag_box">
+			<span class="tag example"><label><span></span><input type="text" name="tag" value=" " /></label></span>
+			<div class="contents">
+			</div>
+		</div>
+	</body>
+</html>
