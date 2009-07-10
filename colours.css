@@ -27,6 +27,9 @@ span.tag label.vermelho {
 span.tag label.verde {
 	background: #66C804;
 }
+span.tag label.verde.claro {
+	background: #AAE254;
+}
 span.tag label.verde.mar {
 	background: #3CB371;
 }
@@ -54,7 +57,7 @@ span.tag label.turquesa {
 }
 span.tag label.piscina *,
 span.tag label.turquesa *{
-	color:#285E6F !important;
+	color:#000 !important;
 }
 span.tag label.magenta {
 	background: #F0F;

@@ -121,7 +121,7 @@
 							var target = $(e.target);
 							if(target.is('abbr')){
 
-								$(this).hide('fast',function() {
+								$(this).animate({width:'hide'},'fast',function() {
 									$(this).remove();
 								})
 								return false;
