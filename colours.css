@@ -27,6 +27,19 @@ span.tag label.vermelho {
 span.tag label.verde {
 	background: #66C804;
 }
+span.tag label.caqui,
+span.tag label.cáqui {
+	background: #C3B091;
+}
+span.tag label.chumbo,
+span.tag label.grafite {
+	background: #3B444B
+}
+span.tag label.oliva,
+span.tag label.verde.oliva,
+span.tag label.verde.azeitona {
+	background: #808000;
+}
 span.tag label.verde.claro {
 	background: #AAE254;
 }
@@ -81,10 +94,32 @@ span.tag label.roxo.claro {
 
 span.tag label.amarelo,
 span.tag label.verde.vermelho {
-	background:#E2DC14;
+	background:#FFEF14;
+}
+span.tag label.ouro,
+span.tag label.dourada,
+span.tag label.dourado {
+	background:#DBC136;
+}
+span.tag label.ouro.fosco {
+	background: #CFB53B
+}
+span.tag label.ouro.velho {
+	background: #C5B358;
+}
+span.tag label.ouro *,
+span.tag label.dourada *,
+span.tag label.dourado * {
+	color: #000 !important;
+}
+span.tag label.mostarda *{
+	color: #000 !important;
+}
+span.tag label.mostarda {
+	background: #FC0;
 }
 span.tag label.amarelo * {
-	color: #1C1C09 !important;
+	color: #000 !important;
 }
 span.tag label.gelo,
 span.tag label.branco{
@@ -121,13 +156,17 @@ span.tag label.cinza {
 span.tag label.cinza.escuro {
 	background: #666;
 }
-span.tag label.bege,
+span.tag label.bege {
+	background: #EDE1B9;
+}
 span.tag label.pele {
 	background: #FDF5E1;
 }
-span.tag label.bege * ,
+span.tag label.bege *{
+	color: #000 !important;
+}
 span.tag label.pele * {
-	color: #ED9E42 !important;
+	color: #000 !important;
 }
 span.tag label.rosa.choque,
 span.tag label.rosa {
@@ -140,11 +179,15 @@ span.tag label.pink {
 span.tag label.laranja {
 	background: #FF6500;
 }
+span.tag label.castanho,
 span.tag label.marron,
 span.tag label.marrom {
 	background: #663101;
 }
-
+span.tag label.marron.claro,
+span.tag label.marrom.claro {
+	background: #835C33;
+}
 span.tag label.azul.claro {
 	background: #57B7FF;
 }
@@ -158,4 +201,18 @@ span.tag label.salmao {
 }
 span.tag label.violeta {
 	background: #C71585
+}
+
+span.tag label.verde.amarelado,
+span.tag label.lima {
+	background: #df0
+}
+
+span.tag label.amarelo.esverdeado {
+	background:#DEFC2F;
+}
+span.tag label.amarelo.esverdeado *,
+span.tag label.verde.amarelado *,
+span.tag label.lima *{
+	color: #000 !important;
 }
