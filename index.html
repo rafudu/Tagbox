@@ -163,18 +163,19 @@
 														var tag = $(this).closest('.tag').after(new_tag());
 														setTimeout(function() {
 															tag.next('.tag').find('input').focus();
-														}, 100);
+														}, 50);
 														return false;
 												}
 											}	
 									})
 									.keyup(setup.keyup)
 									.keyup(function() {
-										$(this).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
+										var target = $(this);
+										target.siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
 										if(this.value.indexOf(",") !== -1){
 											var tags = this.value.split(','),
-											tag = $(this).closest('.tag');
-											this.value = tags[0];
+											tag = target.closest('.tag');
+											target.val(tags[0]).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
 											for (var i = tags.length - 1; i > 0; i--){
 												$(tag).after( new_tag(tags[i]) );
 											};
