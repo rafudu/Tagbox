@@ -94,7 +94,7 @@ z-index: 9999;
 				jQuery.fn.tag_box = function(setup) {
 					
 					var setup = setup || {}
-					
+					var content = this;
 					$(this).append('<span class="tag example"><label><span></span><input type="text" name="tag" value=" " /><abbr title="Fechar">X</abbr></label></span>');
 
 					$(this).find('.tag.example').click(function(e) {
@@ -126,10 +126,13 @@ z-index: 9999;
 						};
 					}
 
-					var	new_tag = function(focus) {
+					var	new_tag = function(text) {
+						var text = text || ""
+						
 						return $('.tag.example')
 								.clone(true).removeClass('example')
 									.find('input')
+									.val(text)
 									.blur(setup.blur)
 									.blur(blur_tag)
 									.keydown(setup.keydown)
@@ -150,7 +153,17 @@ z-index: 9999;
 									.keyup(setup.keyup)
 									.keyup(function() {
 										$(this).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
+										if(this.value.indexOf(",") !== -1){
+											var tags = this.value.split(','),
+											tag = $(this).closest('.tag');
+											this.value = tags[0];
+											for (var i = tags.length - 1; i > 0; i--){
+												$(tag).after( new_tag(tags[i]) );
+											};
+											
+										}
 									})
+									.keyup()
 									.end();
 					}
 
