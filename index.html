@@ -5,25 +5,27 @@
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>tagging tool</title>
 		<style type="text/css" media="screen">
-			#tag_box * {
+			
+			.tag_box * {
 				margin: 0;
 				padding: 0;
 				outline: none;
 			}
 			
-			#tag_box .contents {
+			.tag_box {
 				border: 1px solid #000;
 				margin: 10px;
 				min-height: 60px;
 				cursor: text;
 			}
 			
-			#tag_box span.tag {
+			.tag_box span.tag {
 				float: left;
-				font-family: helvetica;
+				font-family: "Lucida Grande","Verdana";
 			}
-			#tag_box span.tag label {
+			.tag_box span.tag label {
 				background: #656696;
+				border: 1px solid transparent;
 				-webkit-border-radius: 5px;
 				-moz-border-radius: 5px;
 				margin: 3px 0 3px 5px;
@@ -33,23 +35,24 @@
 				min-width: 20px;
 				min-height: 20px;
 			}
-			#tag_box span.tag label abbr:hover {
+			.tag_box span.tag label abbr:hover {
 				cursor: pointer;
 			}
-			#tag_box span.tag label abbr {
+			.tag_box span.tag label abbr {
 				color: #FFF;
 				border: none;
-				font-size: 9px;
+				font-size: 8px;
+				font-weight: bold;
 				line-height: 12px;
 				position: absolute;
-				right: 2px;
+				right: 3px;
 z-index: 9999;
-				height: 10px;
-				padding: 2px;
-				top: 50%;
-				margin-top: -7px;
+				height: 100%;
+				line-height: 20px;
+
+				
 			}
-			#tag_box span.tag input {
+			.tag_box span.tag input {
 				border: none;
 				background: transparent;
 				color: #fff;
@@ -63,10 +66,10 @@ z-index: 9999;
 				text-align: center
 			}
 			span.tag input, span.tag label span {
-				font-family: helvetica;
-				font-size: 12px;
+				font-family: "Lucida Grande","Verdana";
+				font-size: 11px;
 			}
-			#tag_box span.tag label span {
+			.tag_box span.tag label span {
 				display: inline-block;
 				visibility: hidden;
 				margin-left: 5px;
@@ -75,76 +78,101 @@ z-index: 9999;
 			.example {
 				display: none !important;
 			}
+			
 		</style>
+		<link rel="stylesheet" href="colours.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		
 		<script src="http://www.google.com/jsapi"></script>
+		
+		<script type="text/javascript" charset="utf-8">
+			
+		</script>
 		<script>
 		  // Load 
 		  google.load("jquery", "1");
 		  google.setOnLoadCallback(function() {
-				$(".contents").click(function(e) {
-					if($(e.target).is('.contents')){
-						$(this).append(new_tag()).find('.tag:last input').focus();
-					}
+				jQuery.fn.tag_box = function(setup) {
 					
-				})
-				var blur_tag = function(e) {
-					if (!$.trim($(this).val())) {
-						setTimeout(function() {
-							$(e.target).closest('.tag').remove();
-						}, 200);
-					};
-				}
-				var	new_tag = function(focus) {
-					return $('.tag.example').clone(true).removeClass('example').find('input').blur(blur_tag).end();
-				}
-				$('.tag input').live('keydown',function(e) {
-					console.info(e.keyCode);
-					if(e.keyCode == 188){
-						e.preventDefault();
-					}
-					if(e.keyCode==9 || e.which == 9 || e.keyCode == 188){ // if TAB
-						if (!e.shiftKey && $.trim($(this).val())) {
-									var tag = $(this).closest('.tag').after(new_tag());
-									setTimeout(function() {
-										tag.next('.tag').find('input').focus();
-									}, 100);
-									return false;
-							}
-						}	
-				})
-				$('.tag input').live('keyup',function(e) {
+					var setup = setup || {}
 					
-					$(this).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
-					
-				}).keyup();
-				
-				$('span.tag').live('click',function(e) {
-					e.stopPropagation();
+					$(this).append('<span class="tag example"><label><span></span><input type="text" name="tag" value=" " /><abbr title="Fechar">X</abbr></label></span>');
 
-					var target = $(e.target);
-					if(target.is('abbr')){
-						
-						$(this).fadeOut('fast',function() {
-							$(this).remove();
-						})
-						return false;
+					$(this).find('.tag.example').click(function(e) {
+							e.stopPropagation();
+
+							var target = $(e.target);
+							if(target.is('abbr')){
+
+								$(this).hide('fast',function() {
+									$(this).remove();
+								})
+								return false;
+							}
+							if (target.is('span.tag')) {
+								target.before(new_tag());
+								target.prev('.tag').find(':input').focus();
+							};
+
+					})
+					$(this).click(function(e) {
+							$(this).append(new_tag()).find('.tag:last input').focus();
+					})
+
+					var blur_tag = function(e) {
+						if (!$.trim($(this).val())) {
+							setTimeout(function() {
+								$(e.target).closest('.tag').remove();
+							}, 100);
+						};
 					}
-					if (target.is('span.tag')) {
-						target.before(new_tag());
-						target.prev('.tag').find(':input').focus();
-					};
-				})
-				$(".contents").click();
+
+					var	new_tag = function(focus) {
+						return $('.tag.example')
+								.clone(true).removeClass('example')
+									.find('input')
+									.blur(setup.blur)
+									.blur(blur_tag)
+									.keydown(setup.keydown)
+									.keydown(function(e) {
+										if(e.keyCode == 188 || e.keyCode == 13){
+											e.preventDefault();
+										}
+										if(e.keyCode==9 || e.which == 9 || e.keyCode == 188 || e.keyCode == 13){ // if TAB
+											if (!e.shiftKey && $.trim($(this).val())) {
+														var tag = $(this).closest('.tag').after(new_tag());
+														setTimeout(function() {
+															tag.next('.tag').find('input').focus();
+														}, 100);
+														return false;
+												}
+											}	
+									})
+									.keyup(setup.keyup)
+									.keyup(function() {
+										$(this).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
+									})
+									.end();
+					}
+
+					$(this).click();
+				}
+			$('.tag_box').tag_box({
+				keyup: function(e){
+					clearTimeout(this.colorTimeout);
+					this.colorTimeout = setTimeout(function() {
+						e.target.parentNode.className = e.target.value.replace(/[-]/gim," ");
+					}, 200);
+					
+				}
+			});
 			})
 		</script>
 	</head>
 	<body>
 		<h1>Tagging tool</h1>
 		
-		<div id="tag_box">
-			<span class="tag example"><label><span></span><input type="text" name="tag" value=" " /><abbr title="Fechar">X</abbr></label></span>
-			<div class="contents">
-			</div>
+		<div class="tag_box">		
+			
 		</div>
 	</body>
 </html>

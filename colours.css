@@ -1,0 +1,110 @@
+span.tag label.azul {
+	background: #003DB5;
+}
+span.tag label.vermelho {
+	background: #AE331E;
+}
+span.tag label.verde {
+	background: #66C804;
+}
+
+span.tag label.verde.escuro {
+	background: #2F6512;
+}
+
+span.tag label.esverdeado.azul,
+span.tag label.verde.azul,
+span.tag label.verde.azulado,
+span.tag label.verde-azulado,
+span.tag label.azul-esverdeado{
+	background:#1EB9C1;
+}
+span.tag label.piscina,
+span.tag label.turquesa {
+	background: #5EDAFF;
+}
+span.tag label.piscina *,
+span.tag label.turquesa *{
+	color:#285E6F !important;
+}
+span.tag label.magenta {
+	background: #F0F;
+}
+span.tag label.petroleo,
+span.tag label.petróleo {
+	background: #004080;
+}
+span.tag label.roxo,
+span.tag label.azul.avermelhado,
+span.tag label.vermelho.azulado,
+span.tag label.azul.vermelho {
+	background:	#6B3099;
+}
+
+span.tag label.lilas,
+span.tag label.lilás,
+span.tag label.roxo.claro {
+	background:#9B64C1;
+}
+
+span.tag label.amarelo,
+span.tag label.verde.vermelho {
+	background:#E2DC14;
+}
+span.tag label.amarelo * {
+	color: #000 !important;
+}
+span.tag label.gelo,
+span.tag label.branco{
+	background:#FFF;
+	border: 1px solid #656696;
+	color: #656696;
+	background: #F7F7FB;
+}
+
+span.tag label.gelo *,
+span.tag label.branco * {
+	color : #656696 !important;
+}
+
+span.tag label.preto.branco,
+span.tag label.preto,
+span.tag label.ebano,
+span.tag label.ébano,
+span.tag label.negro {
+	background: #333;
+}
+
+span.tag label.cinza {
+	background: #999;
+}
+span.tag label.bege,
+span.tag label.pele {
+	background: #FDF5E1;
+}
+span.tag label.bege * ,
+span.tag label.pele * {
+	color: #ED9E42 !important;
+}
+span.tag label.rosa.choque,
+span.tag label.rosa {
+	background: #FA66B0;
+}
+span.tag label.pink {
+	background: #FF0092;
+}
+
+span.tag label.laranja {
+	background: #FF6500;
+}
+span.tag label.marron,
+span.tag label.marrom {
+	background: #663101;
+}
+
+span.tag label.azul.claro {
+	background: #57B7FF;
+}
+span.tag label.maconha {
+	background: #008000;
+}
