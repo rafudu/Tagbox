@@ -192,7 +192,7 @@
 				keyup: function(e){
 					clearTimeout(this.colorTimeout);
 					this.colorTimeout = setTimeout(function() {
-						e.target.parentNode.className = e.target.value.replace(/[-]/gim," ");
+						e.target.parentNode.className = e.target.value.replace(/[-]/gim," ").toLowerCase();
 					}, 300);
 					
 				}

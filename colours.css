@@ -91,15 +91,17 @@ span.tag label.branco{
 	background:#FFF;
 	border: 1px solid #656696;
 	color: #656696;
-	background: #F7F7FB;
 }
-
+span.tag label.gelo {
+	background: #f7f7f7;
+}
 span.tag label.gelo *,
 span.tag label.branco * {
 	color : #656696 !important;
 }
 span.tag label.preto.branco * {
 	color: #FFF !important;
+
 }
 span.tag label.preto.branco,
 span.tag label.preto,
@@ -107,6 +109,7 @@ span.tag label.ebano,
 span.tag label.ébano,
 span.tag label.negro {
 	background: #333;
+	border-color: transparent;
 }
 
 span.tag label.prata {
@@ -114,6 +117,9 @@ span.tag label.prata {
 }
 span.tag label.cinza {
 	background: #999;
+}
+span.tag label.cinza.escuro {
+	background: #666;
 }
 span.tag label.bege,
 span.tag label.pele {
