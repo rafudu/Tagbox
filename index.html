@@ -158,8 +158,8 @@
 										if(e.keyCode == 188 || e.keyCode == 13){
 											e.preventDefault();
 										}
-										if(e.keyCode==9 || e.which == 9 || e.keyCode == 188 || e.keyCode == 13){ // if TAB
-											if (!e.shiftKey && $.trim($(this).val())) {
+										if(e.keyCode==9 || e.keyCode == 188 || e.keyCode == 13){ // if TAB, ENTER or ,
+											if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest('.tag').next('.tag').length) {
 														var tag = $(this).closest('.tag').after(new_tag());
 														setTimeout(function() {
 															tag.next('.tag').find('input').focus();
