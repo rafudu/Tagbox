@@ -2,7 +2,8 @@ span.tag label.azul {
 	background: #1231C8;
 }
 
-span.tag label.azul.escuro {
+span.tag label.azul.escuro,
+span.tag label.azul.noite {
 	background: #10217A;
 }
 
@@ -28,6 +29,9 @@ span.tag label.verde {
 }
 span.tag label.verde.mar {
 	background: #3CB371;
+}
+span.tag label.verde.bandeira {
+	background: #00AE00;
 }
 span.tag label.verde abbr,
 span.tag label.verde * {
@@ -102,7 +106,9 @@ span.tag label.negro {
 	background: #333;
 }
 
-span.tag label.prata,
+span.tag label.prata {
+	background: #BBB;
+}
 span.tag label.cinza {
 	background: #999;
 }
@@ -135,4 +141,12 @@ span.tag label.azul.claro {
 }
 span.tag label.maconha {
 	background: #008000;
+}
+span.tag label.salmon,
+span.tag label.salmão,
+span.tag label.salmao {
+	background: #FA7F72;
+}
+span.tag label.violeta {
+	background: #C71585
 }

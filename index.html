@@ -12,6 +12,18 @@
 				text-transform: lowercase;
 				color: #656696;
 			}
+			.clearfix {
+				_height:1%;
+				zoom:1;
+			}
+			.clearfix:after {
+				content:".";
+				visibility:hidden;
+				display:block;
+				clear:both;
+				height:0;
+			}
+			
 			.tag_box * {
 				margin: 0;
 				padding: 0;
@@ -23,6 +35,7 @@
 				margin: 10px;
 				min-height: 60px;
 				cursor: text;
+
 			}
 			
 			.tag_box span.tag {
@@ -189,7 +202,7 @@
 	<body>
 		<h1>Tagbox</h1>
 		
-		<div class="tag_box">		
+		<div class="tag_box clearfix">		
 			
 		</div>
 	</body>
