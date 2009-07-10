@@ -1,17 +1,33 @@
 span.tag label.azul {
-	background: #003DB5;
+	background: #1231C8;
 }
+
+span.tag label.azul.escuro {
+	background: #10217A;
+}
+
 span.tag label.azul *{
 	color: #FFF;
 }
+
 span.tag label.vinho {
 	background: #AE331E;
 }
+span.tag label.bonina {
+	background: #99243B;
+}
+span.tag label.grena,
+span.tag label.grená {
+	background: #831d1c;
+}
 span.tag label.vermelho {
-	background: #E01E11;
+	background: #E02A11;
 }
 span.tag label.verde {
 	background: #66C804;
+}
+span.tag label.verde.mar {
+	background: #3CB371;
 }
 span.tag label.verde abbr,
 span.tag label.verde * {
