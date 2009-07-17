@@ -1,3 +1,6 @@
-h1. Tagbox
+Tagbox
+======
+
 Tagbox is a simple tagging plugin for jQuery. To use it, just call $(selector).tag_box
 
+See example at: [http://saynotofastfood.info/tagging/](http://saynotofastfood.info/tagging/)

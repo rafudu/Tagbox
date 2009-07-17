@@ -68,6 +68,9 @@
 		  // Load 
 		$(function(){
 			$('.tag_box.tags').tag_box();
+			$('.tag_box.separators').tag_box({
+				separator: /[,.; ]/
+			});
 			$('.tag_box.colours').tag_box({ 
 				keyup: function(e){
 					clearTimeout(this.colorTimeout);
@@ -87,9 +90,12 @@
 	<body>
 		<h1>Tagbox</h1>
 		<p>This is tagbox, a tagging plugin for jQuery.</p>
+		<p>To create new tags, press ENTER, TAB or ','. You can also paste a comma-separated list (e.g. 1,2,3,4,5 ) and tagbox will split them into tags. The tag-separator character is customizable</p>
 		<div class="tag_box tags clearfix">
 			
 		</div>
+		<hr />
+		<h2>Colours</h2>
 		<p>In this example, you can type some colour names to see what happens. <a href="#colours" rel="see_code">(see code)</a></p>
 		
 			<!-- <pre> -->
@@ -107,6 +113,17 @@
 		<!-- </pre> -->
 	
 		<div class="tag_box colours clearfix ">
+			
+		</div>
+		<hr />
+		<h2>Separators</h2>
+		<p>Here we are using , ; . and space as our separators.<a href="#separators" rel="see_code">(see code)</a></p>
+		<code id="separators">
+	$('.tag_box.separators').tag_box({
+		separator: /[,.; ]/
+	});
+		</code>
+		<div class="tag_box separators clearfix ">
 			
 		</div>
 	</body>

@@ -88,8 +88,7 @@
     $.fn.extend({
         tag_box: function(options) {
 
-            settings = jQuery.extend({},
-            $.tag_box.defaults, options);
+            settings = jQuery.extend($.tag_box.defaults, options);
 
             var content = this;
 
