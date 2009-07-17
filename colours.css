@@ -147,6 +147,7 @@ span.tag label.negro {
 	border-color: transparent;
 }
 
+span.tag label.prateado,
 span.tag label.prata {
 	background: #BBB;
 }
@@ -197,7 +198,12 @@ span.tag label.maconha {
 span.tag label.salmon,
 span.tag label.salmão,
 span.tag label.salmao {
-	background: #FA7F72;
+	background: #FFA07A;
+}
+span.tag label.salmon *,
+span.tag label.salmão *,
+span.tag label.salmao * {
+/*	color: #000 !important;*/
 }
 span.tag label.violeta {
 	background: #C71585
