@@ -99,96 +99,13 @@
 			
 		</style>
 		<link rel="stylesheet" href="colours.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script src="jquery-1.3.2.js" type="text/javascript" charset="utf-8"></script>
+		<script src="jquery.tagbox.js" type="text/javascript" charset="utf-8"></script>
 		
-		<script src="http://www.google.com/jsapi"></script>
-		
-		<script type="text/javascript" charset="utf-8">
-			
-		</script>
 		<script>
 		  // Load 
-		  google.load("jquery", "1");
-		  google.setOnLoadCallback(function() {
-				jQuery.fn.tag_box = function(setup) {
-					
-					var setup = setup || {}
-					var content = this;
-					$(this).append('<span class="tag example"><label><span></span><input type="text" name="tag" value=" " /><abbr title="Fechar">X</abbr></label></span>');
-
-					$(this).find('.tag.example').click(function(e) {
-							e.stopPropagation();
-
-							var target = $(e.target);
-							if(target.is('abbr')){
-
-								$(this).animate({width:'hide'},'fast',function() {
-									$(this).remove();
-								})
-								return false;
-							}
-							if (target.is('span.tag')) {
-								target.before(new_tag());
-								target.prev('.tag').find(':input').focus();
-							};
-
-					})
-					$(this).click(function(e) {
-							$(this).append(new_tag()).find('.tag:last input').focus();
-					})
-
-					var blur_tag = function(e) {
-						if (!$.trim($(this).val())) {
-							setTimeout(function() {
-								$(e.target).closest('.tag').remove();
-							}, 100);
-						};
-					}
-
-					var	new_tag = function(text) {
-						var text = text || ""
-						
-						return $('.tag.example')
-								.clone(true).removeClass('example')
-									.find('input')
-									.val(text)
-									.blur(setup.blur)
-									.blur(blur_tag)
-									.keydown(setup.keydown)
-									.keydown(function(e) {
-										if(e.keyCode == 188 || e.keyCode == 13){
-											e.preventDefault();
-										}
-										if(e.keyCode==9 || e.keyCode == 188 || e.keyCode == 13){ // if TAB, ENTER or ,
-											if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest('.tag').next('.tag').length) {
-														var tag = $(this).closest('.tag').after(new_tag());
-														setTimeout(function() {
-															tag.next('.tag').find('input').focus();
-														}, 50);
-														return false;
-												}
-											}	
-									})
-									.keyup(setup.keyup)
-									.keyup(function() {
-										var target = $(this);
-										target.siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
-										if(this.value.indexOf(",") !== -1){
-											var tags = this.value.split(','),
-											tag = target.closest('.tag');
-											target.val(tags[0]).siblings('span').html(this.value.replace(/ /gim, '&nbsp;')+"M");
-											for (var i = tags.length - 1; i > 0; i--){
-												$(tag).after( new_tag(tags[i]) );
-											};
-											
-										}
-									})
-									.keyup()
-									.end();
-					}
-
-					$(this).click();
-				}
-			$('.tag_box').tag_box({
+		$(function(){
+			$('.tag_box').tag_box({ 
 				keyup: function(e){
 					clearTimeout(this.colorTimeout);
 					this.colorTimeout = setTimeout(function() {
@@ -197,7 +114,7 @@
 					
 				}
 			});
-			})
+		})
 		</script>
 	</head>
 	<body>
