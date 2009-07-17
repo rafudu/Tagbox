@@ -22,10 +22,12 @@
 
             setup_tag(settings.tag, settings);
 
-            $(this).click(function(e) {
-                // If you click the tagbox, a new tag is created
-                $(this).append(new_tag()).find('.'+settings.className+':last input').focus();
-            });
+            this.each(function() {
+							$(this).click(function(e) {
+							            // If you click the tagbox, a new tag is created
+							            $(this).append(new_tag()).find('.'+settings.className+':last input').focus();
+							            });
+						})
 
             // $(this).click();
 
