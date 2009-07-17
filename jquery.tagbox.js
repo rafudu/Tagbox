@@ -2,7 +2,9 @@
 
     $.tag_box = {
         defaults: {
-            separator: /[,]/
+            separator: /[,]/,
+						name: "tag[]",
+						className : "tag"
             // It's possible to use multiple separators, like /[,;.]/
         }
     };
@@ -15,14 +17,14 @@
             var content = this;
             //Setting up the 'default' tag
             settings.tag = document.createElement('span');
-            settings.tag.className = 'tag';
-            settings.tag.innerHTML = '<label><span></span><input type="text" name="tag" value=" " /><abbr title="Fechar">X</abbr></label>';
+            settings.tag.className = settings.className;
+            settings.tag.innerHTML = '<label><span></span><input type="text" name="'+settings.name+'" value=" " /><abbr title="Fechar">X</abbr></label>';
 
             setup_tag(settings.tag, settings);
 
             $(this).click(function(e) {
                 // If you click the tagbox, a new tag is created
-                $(this).append(new_tag()).find('.tag:last input').focus();
+                $(this).append(new_tag()).find('.'+settings.className+':last input').focus();
             });
 
             // $(this).click();
@@ -68,10 +70,10 @@
 
 				                return false;
 				            }
-				            if (target.is('span.tag')) {
+				            if (target.is('.'+settings.className)) {
 				                // The space between the tags is actually the <span> element. If you clicked, you clicked between tags.
 				                target.before(new_tag());
-				                target.prev('.tag').find(':input').focus();
+				                target.prev('.'+settings.className).find(':input').focus();
 				            }
 
 				        })
@@ -81,7 +83,7 @@
 				            if (!$.trim($(this).val())) {
 				                // If empty, remove the tag
 				                setTimeout(function() {
-				                    $(e.target).closest('.tag').remove();
+				                    $(e.target).closest('.'+settings.className).remove();
 				                },
 				                100);
 				                // This timeout is necessary for safari.
@@ -95,11 +97,11 @@
 				            }
 				            if (e.keyCode == 9 || e.keyCode == 13) {
 				                // if TAB or ENTER
-				                if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest('.tag').next('.tag').length) {
+				                if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest('.'+settings.className).next('.'+settings.className).length) {
 				                    // And it's not shift+tab, and do not have a next tag
-				                    var tag = $(this).closest('.tag').after(new_tag());
+				                    var tag = $(this).closest('.'+settings.className).after(new_tag());
 				                    setTimeout(function() {
-				                        tag.next('.tag').find('input').focus();
+				                        tag.next('.'+settings.className).find('input').focus();
 				                    },
 				                    50);
 				                    return false;
@@ -114,7 +116,7 @@
 				            if (this.value.match(options.separator)) {
 				                // If text has separators
 				                var tags = this.value.split(options.separator),
-				                tag = target.closest('.tag');
+				                tag = target.closest('.'+settings.className);
 												target.val(tags[0]).siblings('span').html(sanitize(this.value));
 												
 				                var next_tag = [];
