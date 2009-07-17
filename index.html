@@ -72,10 +72,11 @@
 				separator: /[,.; ]/
 			});
 			$('.tag_box.colours').tag_box({ 
+				className: "tag", 
 				keyup: function(e){
 					clearTimeout(this.colorTimeout);
 					this.colorTimeout = setTimeout(function() {
-						e.target.parentNode.className = e.target.value.replace(/[-]/gim," ").toLowerCase();
+						e.target.parentNode.className = e.target.value.replace(/[-]/gim," ").toLowerCase().replace(/\btag\b/gim,""); // It will break if you set the classname as the default tag className
 					}, 300);
 					
 				}
