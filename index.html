@@ -4,7 +4,13 @@
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>tagging tool</title>
+
+		<link rel="stylesheet" href="tags.css" type="text/css" media="screen" title="no title" charset="utf-8">		
 		<style type="text/css" media="screen">
+		body {
+			font-family: "helvetica";
+			margin: 20px;
+		}
 			h1 {
 				font-family: "helvetica";
 				font-size: 72px;
@@ -32,71 +38,27 @@
 			
 			.tag_box {
 				border: 1px solid #000;
-				margin: 10px;
+				margin: 10px 0;
 				min-height: 60px;
 				cursor: text;
 
 			}
 			
-			.tag_box span.tag {
-				float: left;
-				font-family: "Lucida Grande","Verdana";
-			}
-			.tag_box span.tag label {
-				background: #656696;
-				border: 1px solid transparent;
+			
+			code {
+				background: #f7f7f7;
+				display: none;
+				border: 1px solid #000;
+				font-family: Monaco, monospace;
+				white-space: pre;
+				font-size: 12px;
+				width: 600px;
+				margin: 0 auto;
+				overflow: auto;
 				-webkit-border-radius: 5px;
 				-moz-border-radius: 5px;
-				margin: 3px 0 3px 5px;
-				padding-right: 20px;
-				position: relative;
-				display: inline-block;
-				min-width: 20px;
-				height: 20px;
+				
 			}
-			.tag_box span.tag label abbr:hover {
-				cursor: pointer;
-			}
-			.tag_box span.tag label abbr {
-				color: #FFF;
-				border: none;
-				font-size: 8px;
-				font-weight: bold;
-				line-height: 12px;
-				position: absolute;
-				right: 3px;
-				z-index: 9999;
-				height: 100%;
-				line-height: 22px;
-			}
-			.tag_box span.tag input {
-				border: none;
-				background: transparent;
-				color: #fff;
-				position: absolute;
-				left:0;
-				width: 100%;
-				height: 15px;
-				z-index: 0;
-/*				line-height: 20px;*/
-				text-align: center;
-				padding: 0;
-				top: 3px;
-			}
-			span.tag input, span.tag label span {
-				font-family: "Lucida Grande","Verdana";
-				font-size: 11px;
-			}
-			.tag_box span.tag label span {
-				display: inline-block;
-				visibility: hidden;
-				margin-left: 5px;
-
-			}
-			.example {
-				display: none !important;
-			}
-			
 		</style>
 		<link rel="stylesheet" href="colours.css" type="text/css" media="screen" title="no title" charset="utf-8">
 		<script src="jquery-1.3.2.js" type="text/javascript" charset="utf-8"></script>
@@ -105,7 +67,8 @@
 		<script>
 		  // Load 
 		$(function(){
-			$('.tag_box').tag_box({ 
+			$('.tag_box.tags').tag_box();
+			$('.tag_box.colours').tag_box({ 
 				keyup: function(e){
 					clearTimeout(this.colorTimeout);
 					this.colorTimeout = setTimeout(function() {
@@ -114,13 +77,36 @@
 					
 				}
 			});
+			$('a[rel=see_code]').click(function() {
+				$(this).parent().next('code').slideToggle('fast');
+				return false;
+			})
 		})
 		</script>
 	</head>
 	<body>
 		<h1>Tagbox</h1>
+		<p>This is tagbox, a tagging plugin for jQuery.</p>
+		<div class="tag_box tags clearfix">
+			
+		</div>
+		<p>In this example, you can type some colour names to see what happens. <a href="#colours" rel="see_code">(see code)</a></p>
 		
-		<div class="tag_box clearfix">		
+			<!-- <pre> -->
+				<code id="colours">
+ $('.tag_colours').tag_box({ 
+ 	keyup: function(e){
+ 		clearTimeout(this.colorTimeout);
+ 		this.colorTimeout = setTimeout(function() {
+ 			e.target.parentNode.className = e.target.value.replace(/[-]/gim," ").toLowerCase();
+ 		}, 300);
+
+ 	}
+ });
+			</code>
+		<!-- </pre> -->
+	
+		<div class="tag_box colours clearfix ">
 			
 		</div>
 	</body>

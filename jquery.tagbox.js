@@ -105,7 +105,7 @@
                 $(this).append(new_tag()).find('.tag:last input').focus();
             });
 
-            $(this).click();
+            // $(this).click();
         }
     });
 

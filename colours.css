@@ -1,16 +1,21 @@
+span.tag label.blue,
 span.tag label.azul {
 	background: #1231C8;
 }
 
+span.tag label.azul.night,
+span.tag label.azul.dark,
 span.tag label.azul.escuro,
 span.tag label.azul.noite {
 	background: #10217A;
 }
 
+span.tag label.blue *,
 span.tag label.azul *{
 	color: #FFF;
 }
 
+span.tag label.wine,
 span.tag label.vinho {
 	background: #AE331E;
 }
@@ -21,9 +26,11 @@ span.tag label.grena,
 span.tag label.grená {
 	background: #831d1c;
 }
+span.tag label.red,
 span.tag label.vermelho {
 	background: #E02A11;
 }
+span.tag label.green,
 span.tag label.verde {
 	background: #66C804;
 }
@@ -31,43 +38,58 @@ span.tag label.caqui,
 span.tag label.cáqui {
 	background: #C3B091;
 }
+span.tag label.carbon,
+span.tag label.led,
 span.tag label.chumbo,
 span.tag label.grafite {
 	background: #3B444B
 }
+span.tag label.olive.green,
+span.tag label.olive,
 span.tag label.oliva,
 span.tag label.verde.oliva,
 span.tag label.verde.azeitona {
 	background: #808000;
 }
+span.tag label.green.light,
 span.tag label.verde.claro {
 	background: #AAE254;
 }
+span.tag label.green.sea,
 span.tag label.verde.mar {
 	background: #3CB371;
 }
 span.tag label.verde.bandeira {
 	background: #00AE00;
 }
+span.tag label.green *,
+span.tag label.green abbr,
 span.tag label.verde abbr,
 span.tag label.verde * {
 	color:#FFF;
 }
+span.tag label.green.dark,
 span.tag label.verde.escuro {
 	background: #2F6512;
 }
 
+span.tag label.greenish.blue,
 span.tag label.esverdeado.azul,
+span.tag label.green.blue,
 span.tag label.verde.azul,
 span.tag label.verde.azulado,
 span.tag label.verde-azulado,
 span.tag label.azul-esverdeado{
 	background:#1EB9C1;
 }
+span.tag label.pool,
+span.tag label.turquoise,
 span.tag label.piscina,
 span.tag label.turquesa {
 	background: #5EDAFF;
 }
+span.tag label.turquoise *,
+span.tag label.pool *,
 span.tag label.piscina *,
 span.tag label.turquesa *{
 	color:#000 !important;
@@ -75,10 +97,13 @@ span.tag label.turquesa *{
 span.tag label.magenta {
 	background: #F0F;
 }
+span.tag label.ocean,
 span.tag label.petroleo,
 span.tag label.petróleo {
 	background: #004080;
 }
+span.tag label.red.blue,
+span.tag label.purple,
 span.tag label.roxo,
 span.tag label.azul.avermelhado,
 span.tag label.vermelho.azulado,
@@ -92,10 +117,13 @@ span.tag label.roxo.claro {
 	background:#9B64C1;
 }
 
+span.tag label.yellow,
 span.tag label.amarelo,
 span.tag label.verde.vermelho {
 	background:#FFEF14;
 }
+span.tag label.golden,
+span.tag label.gold,
 span.tag label.ouro,
 span.tag label.dourada,
 span.tag label.dourado {
@@ -107,37 +135,52 @@ span.tag label.ouro.fosco {
 span.tag label.ouro.velho {
 	background: #C5B358;
 }
+span.tag label.golden *,
+span.tag label.gold *,
 span.tag label.ouro *,
 span.tag label.dourada *,
 span.tag label.dourado * {
 	color: #000 !important;
 }
+span.tag label.mustard *,
 span.tag label.mostarda *{
 	color: #000 !important;
 }
+span.tag label.mustard,
 span.tag label.mostarda {
 	background: #FC0;
 }
+span.tag label.yellow * ,
 span.tag label.amarelo * {
 	color: #000 !important;
 }
+span.tag label.white,
+span.tag label.ice,
 span.tag label.gelo,
 span.tag label.branco{
 	background:#FFF;
 	border: 1px solid #656696;
 	color: #656696;
 }
+span.tag label.ice,
 span.tag label.gelo {
 	background: #f7f7f7;
 }
+span.tag label.white *,
+span.tag label.ice *,
 span.tag label.gelo *,
 span.tag label.branco * {
 	color : #656696 !important;
 }
+span.tag label.black.white *,
 span.tag label.preto.branco * {
 	color: #FFF !important;
 
 }
+span.tag label.ebony,
+span.tag label.black,
+span.tag label.white,
+span.tag label.black.white,
 span.tag label.preto.branco,
 span.tag label.preto,
 span.tag label.ebano,
@@ -147,25 +190,34 @@ span.tag label.negro {
 	border-color: transparent;
 }
 
+span.tag label.silver,
 span.tag label.prateado,
 span.tag label.prata {
 	background: #BBB;
 }
+span.tag label.gray ,
+span.tag label.grey ,
 span.tag label.cinza {
 	background: #999;
 }
+span.tag label.grey.dark ,
+span.tag label.grey.dark ,
 span.tag label.cinza.escuro {
 	background: #666;
 }
+span.tag label.beige,
 span.tag label.bege {
 	background: #EDE1B9;
 }
+span.tag label.skin,
 span.tag label.pele {
 	background: #FDF5E1;
 }
+span.tag label.beige *,
 span.tag label.bege *{
 	color: #000 !important;
 }
+span.tag label.skin *,
 span.tag label.pele * {
 	color: #000 !important;
 }
@@ -177,24 +229,26 @@ span.tag label.pink {
 	background: #FF0092;
 }
 
+span.tag label.orange,
 span.tag label.laranja {
 	background: #FF6500;
 }
+span.tag label.brown,
 span.tag label.castanho,
 span.tag label.marron,
 span.tag label.marrom {
 	background: #663101;
 }
+span.tag label.brown.light,
 span.tag label.marron.claro,
 span.tag label.marrom.claro {
 	background: #835C33;
 }
+span.tag label.blue.light ,
 span.tag label.azul.claro {
 	background: #57B7FF;
 }
-span.tag label.maconha {
-	background: #008000;
-}
+
 span.tag label.salmon,
 span.tag label.salmão,
 span.tag label.salmao {
@@ -205,10 +259,13 @@ span.tag label.salmão *,
 span.tag label.salmao * {
 /*	color: #000 !important;*/
 }
+span.tag label.violet,
 span.tag label.violeta {
 	background: #C71585
 }
 
+span.tag label.lime,
+span.tag label.green.yellow,
 span.tag label.verde.amarelado,
 span.tag label.lima {
 	background: #df0
@@ -219,6 +276,7 @@ span.tag label.amarelo.esverdeado {
 }
 span.tag label.amarelo.esverdeado *,
 span.tag label.verde.amarelado *,
+span.tag label.lime *,
 span.tag label.lima *{
 	color: #000 !important;
 }
