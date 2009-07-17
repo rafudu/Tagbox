@@ -115,16 +115,22 @@
 				                // If text has separators
 				                var tags = this.value.split(options.separator),
 				                tag = target.closest('.tag');
-				                target.val(tags[0]).siblings('span').html(sanitize(this.value));
+												target.val(tags[0]).siblings('span').html(sanitize(this.value));
+												
 				                var next_tag = [];
 
 				                for (var i = tags.length - 1; i > 0; i--) {
 				                    next_tag.push($(tag).after(new_tag(tags[i])).next());
 				                    // Create new tags for each separator
 				                };
-
+												// Focus the last shown (first created) tag
 				                next_tag.shift().find('input').focus();
-				                // Focus the last shown (first created) tag
+				
+												if (!$.trim(tags[0])) { //If the first tag is empty, remove
+													tag.remove();
+												}
+				
+				                
 				            }
 				        })
 				    }
