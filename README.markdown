@@ -62,7 +62,7 @@ We provide you the ability to hook custom events to the `blur`, `onkeyup` and `o
 
 #Other uses
 
-Use your creativity! Tagbox can be used in other types of user input, like contacts, product properties, etc.
+Use your creativity! Tagbox can be used in other kinds of user input, like contacts, product properties, etc.
 
 #Contact
 
