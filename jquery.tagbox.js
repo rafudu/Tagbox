@@ -35,8 +35,7 @@
 
 
 						function sanitize(text){
-							// tag,box,is,working, vermelho
-							return text.replace(/\s/gim, '&nbsp;').replace("<", "&lt;") + "M"
+							return text.replace(/\s/g, '&nbsp;').replace("<", "&lt;") + "M"
 						}
 
 						function set_label(tag, text){
@@ -51,11 +50,11 @@
 							if (text.charAt(text.length-1).match(settings.separator)) {
 								last_separator = text.charAt(text.length-1);
 							};
-							var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"gim"),
+							var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"g"),
 							tags;
 							
 							//Remove extra spaces, remove the matched groups and split by separator.
-							tags = text.replace(groups, "").replace(/(\s)\s/gim,"$1").split(settings.separator);
+							tags = text.replace(groups, "").replace(/(\s)\s/g,"$1").split(settings.separator);
 							groups = text.match(groups); // Return the groups
 							
 							text = $.map($.merge(groups, tags), function(tag) {
