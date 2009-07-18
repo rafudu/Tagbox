@@ -44,7 +44,11 @@
 
 						function split_groups (text) {
 							// TODO : This function does not respect the tag order. It will show the groups first and then the other tags.
-							
+							var last_separator = "";
+
+							if (text.charAt(text.length-1).match(settings.separator)) {
+								last_separator = text.charAt(text.length-1);
+							};
 							var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"gim"),
 							tags;
 							
@@ -52,7 +56,13 @@
 							tags = text.replace(groups, "").replace(/(\s)\s/gim,"$1").split(settings.separator);
 							groups = text.match(groups); // Return the groups
 							
-							return $.merge(groups, tags);
+							text = $.map($.merge(groups, tags), function(tag) {
+								if(tag){
+									return $.trim(tag);
+								}
+							});
+							text.push(last_separator);
+							return text;
 						}
 				    function new_tag(text) {
 				        var text = text || ""
@@ -130,25 +140,37 @@
 				            // Add "M" to correct the tag size. Weird, but works! Using M because it's probally the widest character.
 				            if (value.match(options.separator)) {
 				                // If text has separators
-				
-												//If options.grouping and matches grouping character
+												
+												
 												if (options.grouping && value.indexOf(options.grouping) !== -1) {
-																							
+													//If options.grouping and matches grouping character											
+													
 													var groupings = [value.indexOf(options.grouping), value.lastIndexOf(options.grouping)]
 													// Store the locations of the grouping characters.
 													
 													if(groupings[0] == groupings[1]){ // Has a grouping char, but not terminated. The first and last occurrencies are in the same place. i.e. are the same.
 														return; // stop script. No need to split
 													}else {
+														
+														var is_group = new RegExp(("^"+options.grouping)+'.*'+(options.grouping+'$'));
+														
+
+														
+														if (value.match(is_group) && value.match(new RegExp(options.grouping, "g")).length == 2) {
+															// If it's a closed group (just 2 grouping chars, different places)
+															return;
+														}else{
 														// Split the groups
 														value = split_groups(value);
-														
+														}
 													}
+													
 												};
 												
 												// If text has separators
 												var tags;
 												if (value.constructor === Array) {
+													// If value is an Array, it's already splitted into tags
 													tags = value;
 												}else {
 													tags = value.split(options.separator);
@@ -157,9 +179,8 @@
 												target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
 												
 				                var next_tag = [];
-
 				                for (var i = tags.length - 1; i > 0; i--) {
-														console.info(tags[i]);
+														
 				                    next_tag.push($(tag).after(new_tag(tags[i])).next());
 				                    // Create new tags for each separator
 				                };
