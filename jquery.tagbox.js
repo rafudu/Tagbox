@@ -42,6 +42,18 @@
 							return tag;
 						}
 
+						function split_groups (text) {
+							// TODO : This function does not respect the tag order. It will show the groups first and then the other tags.
+							
+							var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"gim"),
+							tags;
+							
+							//Remove extra spaces, remove the matched groups and split by separator.
+							tags = text.replace(groups, "").replace(/(\s)\s/gim,"$1").split(settings.separator);
+							groups = text.match(groups); // Return the groups
+							
+							return $.merge(groups, tags);
+						}
 				    function new_tag(text) {
 				        var text = text || ""
 
@@ -112,18 +124,42 @@
 				        })
 				        .keyup(options.keyup)
 				        .keyup(function() {
-				            var target = $(this);
+				            var target = $(this),
+										value = this.value;
 				            target.siblings('span').html(sanitize(this.value));
-				            // Add "M" to correct the tag size. Weird, but works!
-				            if (this.value.match(options.separator)) {
+				            // Add "M" to correct the tag size. Weird, but works! Using M because it's probally the widest character.
+				            if (value.match(options.separator)) {
 				                // If text has separators
-				                var tags = this.value.split(options.separator),
+				
+												//If options.grouping and matches grouping character
+												if (options.grouping && value.indexOf(options.grouping) !== -1) {
+																							
+													var groupings = [value.indexOf(options.grouping), value.lastIndexOf(options.grouping)]
+													// Store the locations of the grouping characters.
+													
+													if(groupings[0] == groupings[1]){ // Has a grouping char, but not terminated. The first and last occurrencies are in the same place. i.e. are the same.
+														return; // stop script. No need to split
+													}else {
+														// Split the groups
+														value = split_groups(value);
+														
+													}
+												};
+												
+												// If text has separators
+												var tags;
+												if (value.constructor === Array) {
+													tags = value;
+												}else {
+													tags = value.split(options.separator);
+												}
 				                tag = target.closest('.'+settings.className);
-												target.val(tags[0]).siblings('span').html(sanitize(this.value));
+												target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
 												
 				                var next_tag = [];
 
 				                for (var i = tags.length - 1; i > 0; i--) {
+														console.info(tags[i]);
 				                    next_tag.push($(tag).after(new_tag(tags[i])).next());
 				                    // Create new tags for each separator
 				                };

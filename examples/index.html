@@ -81,6 +81,11 @@
 					
 				}
 			});
+			
+			$('.tag_box.groupings').tag_box({
+				grouping: '"',
+				separator: /[ ]/, 
+			})
 			$('a[rel=see_code]').click(function() {
 				$(this).parent().next('code').slideToggle('fast');
 				return false;
@@ -128,6 +133,18 @@
 	});
 		</code>
 		<div class="tag_box separators clearfix ">
+			
+		</div>
+		
+		<h2>Grouping</h2>
+		<p>Here we are using space as our separator, but we group any text that's surrounded by double-quotes .<a href="#grouping" rel="see_code">(see code)</a></p>
+		<code id="separators">
+	$('.tag_box.separators').tag_box({
+		grouping: /".*?"/,
+		separator:/[ ]/
+	});
+		</code>
+		<div class="tag_box groupings clearfix ">
 			
 		</div>
 		<script type="text/javascript">
