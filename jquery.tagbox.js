@@ -14,6 +14,8 @@
         tag_box: function(settings) {
 						
             settings = jQuery.extend({},$.tag_box.defaults, settings);
+						
+						settings.tag_class = '.'+settings.className;
             var content = this;
             //Setting up the 'default' tag
             settings.tag = document.createElement('span');
@@ -25,7 +27,7 @@
             this.each(function() {
 							$(this).click(function(e) {
 							            // If you click the tagbox, a new tag is created
-							            $(this).append(new_tag()).find('.'+settings.className+':last input').focus();
+							            $(this).append(new_tag()).find(settings.tag_class+':last input').focus();
 							            });
 						})
 
@@ -94,10 +96,10 @@
 
 				                return false;
 				            }
-				            if (target.is('.'+settings.className)) {
+				            if (target.is(settings.tag_class)) {
 				                // The space between the tags is actually the <span> element. If you clicked, you clicked between tags.
 				                target.before(new_tag());
-				                target.prev('.'+settings.className).find(':input').focus();
+				                target.prev(settings.tag_class).find(':input').focus();
 				            }
 
 				        })
@@ -107,7 +109,7 @@
 				            if (!$.trim($(this).val())) {
 				                // If empty, remove the tag
 				                setTimeout(function() {
-				                    $(e.target).closest('.'+settings.className).remove();
+				                    $(e.target).closest(settings.tag_class).remove();
 				                },
 				                100);
 				                // This timeout is necessary for safari.
@@ -115,17 +117,31 @@
 				        })
 				        .keydown(options.keydown)
 				        .keydown(function(e) {
+										if(e.keyCode == 8 ) {
+											// If BACKSPACE
+											if (!$.trim($(this).val())) {
+												var tag = $(this).closest(settings.tag_class),
+												prev_tag = tag.prev(settings.tag_class);
+												if(prev_tag.length){
+													prev_tag.find(':input').focus();
+													tag.remove();
+													e.preventDefault();
+												}
+												
+											};
+											
+										}
 				            if (e.keyCode == 13) {
 				                // If ENTER key, do not submit.
 				                e.preventDefault();
 				            }
 				            if (e.keyCode == 9 || e.keyCode == 13) {
 				                // if TAB or ENTER
-				                if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest('.'+settings.className).next('.'+settings.className).length) {
+				                if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
 				                    // And it's not shift+tab, and do not have a next tag
-				                    var tag = $(this).closest('.'+settings.className).after(new_tag());
+				                    var tag = $(this).closest(settings.tag_class).after(new_tag());
 				                    setTimeout(function() {
-				                        tag.next('.'+settings.className).find('input').focus();
+				                        tag.next(settings.tag_class).find('input').focus();
 				                    },
 				                    50);
 				                    return false;
@@ -175,7 +191,7 @@
 												}else {
 													tags = value.split(options.separator);
 												}
-				                tag = target.closest('.'+settings.className);
+				                tag = target.closest(settings.tag_class);
 												target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
 												
 				                var next_tag = [];
