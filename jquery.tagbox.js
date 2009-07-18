@@ -3,7 +3,7 @@
     $.tag_box = {
         defaults: {
             separator: /[,]/,
-						name: "tag[]",
+						name: "tags[]",
 						className : "tag"
             // It's possible to use multiple separators, like /[,;.]/
         }
@@ -105,6 +105,8 @@
 				        })
 				        .find('input')
 				        .blur(options.blur)
+								.keydown(options.keydown)
+								.keyup(options.keyup)
 				        .blur(function(e) {
 				            if (!$.trim($(this).val())) {
 				                // If empty, remove the tag
@@ -115,7 +117,7 @@
 				                // This timeout is necessary for safari.
 				            }
 				        })
-				        .keydown(options.keydown)
+				        
 				        .keydown(function(e) {
 										if(e.keyCode == 8 ) {
 											// If BACKSPACE
@@ -148,7 +150,7 @@
 				                }
 				            }
 				        })
-				        .keyup(options.keyup)
+				        
 				        .keyup(function() {
 				            var target = $(this),
 										value = this.value;
