@@ -34,11 +34,11 @@
 
 						function sanitize(text){
 							// tag,box,is,working, vermelho
-							return text.replace(/ /gim, '&nbsp;').replace("<", "&lt;") + "M"
+							return text.replace(/\s/gim, '&nbsp;').replace("<", "&lt;") + "M"
 						}
 
 						function set_label(tag, text){
-							tag.find('input').val(text).siblings('span').text(sanitize(text));
+							tag.find('input').val(text).siblings('span').html(sanitize(text));
 							return tag;
 						}
 
@@ -72,7 +72,7 @@
 				        .find('input')
 				        .val(text)
 								.siblings('span')
-								.text(sanitize(text))
+								.html(sanitize(text))
 				        .end()
 				        .end();
 				    };
