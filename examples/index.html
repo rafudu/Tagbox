@@ -133,9 +133,26 @@
 	});
 		</code>
 		<div class="tag_box separators clearfix ">
-			
+
 		</div>
-		
+
+		<h2>Initial value</h2>
+		<p>Tagbox checks if the div has any text and parse it into tags, using your settings.<a href="#grouping" rel="see_code">(see code)</a></p>
+		<code id="separators">
+	$('.tag_box.initial_value').tag_box({
+		grouping: '"',
+		separator:/[\s]/
+	});
+		</code>
+		<div class="tag_box initial_value clearfix ">
+			"New York" concert "Madison square garden" u2
+		</div>
+		<script type="text/javascript" charset="utf-8">
+			$('.tag_box.initial_value').tag_box({
+				grouping: '"',
+				separator:/[\s]/
+			});
+		</script>
 		<h2>Grouping</h2>
 		<p>Here we are using space as our separator, but we group any text that's surrounded by double-quotes .<a href="#grouping" rel="see_code">(see code)</a></p>
 		<code id="separators">

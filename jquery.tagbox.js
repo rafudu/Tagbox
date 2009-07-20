@@ -29,6 +29,19 @@
 							            // If you click the tagbox, a new tag is created
 							            $(this).append(new_tag()).find(settings.tag_class+':last input').focus();
 							            });
+							if ($.trim($(this).text())) {
+								var tags = split_tags($.trim($(this).text()));
+								$(this).text("");
+								var box = $(this);
+								$.each(tags, function(){
+									if($.trim(this)){
+										box.append(new_tag(this));
+									}
+								})
+								// $(this).text("");
+								console.info(tags);
+								// $(this).append(new_tag(tags)).find(settings.tag_class).keyup();
+							};
 						})
 
             // $(this).click();
@@ -42,7 +55,41 @@
 							tag.find('input').val(text).siblings('span').html(sanitize(text));
 							return tag;
 						}
+						
+						function split_tags (text){
+							if (settings.grouping && text.indexOf(settings.grouping) !== -1) {
+								//If settings.grouping and matches grouping character											
+								
+								var groupings = [text.indexOf(settings.grouping), text.lastIndexOf(settings.grouping)]
+								// Store the locations of the grouping characters.
+								
+								if(groupings[0] == groupings[1]){ // Has a grouping char, but not terminated. The first and last occurrencies are in the same place. i.e. are the same.
+									return false; // stop script. No need to split
+								}else {
+									
+									var is_group = new RegExp(("^"+settings.grouping)+'.*'+(settings.grouping+'$'));
+									
 
+									
+									if (text.match(is_group) && text.match(new RegExp(settings.grouping, "g")).length == 2) {
+										// If it's a closed group (just 2 grouping chars, different places)
+										return;
+									}else{
+									// Split the groups
+									text = split_groups(text);
+									}
+								}
+								
+							};
+							
+							// If text has separators
+							
+							if (text.constructor === String) {
+								// If text is an Array, it's already splitted into tags
+								text = text.split(settings.separator);
+							}
+							return text
+						}
 						function split_groups (text) {
 							// TODO : This function does not respect the tag order. It will show the groups first and then the other tags.
 							var last_separator = "";
@@ -75,7 +122,8 @@
 								.siblings('span')
 								.html(sanitize(text))
 				        .end()
-				        .end();
+				        .end()
+				.keyup();
 				    };
 
 						function setup_tag(tag, options) {
@@ -159,40 +207,12 @@
 				                // If text has separators
 												
 												
-												if (options.grouping && value.indexOf(options.grouping) !== -1) {
-													//If options.grouping and matches grouping character											
-													
-													var groupings = [value.indexOf(options.grouping), value.lastIndexOf(options.grouping)]
-													// Store the locations of the grouping characters.
-													
-													if(groupings[0] == groupings[1]){ // Has a grouping char, but not terminated. The first and last occurrencies are in the same place. i.e. are the same.
-														return; // stop script. No need to split
-													}else {
-														
-														var is_group = new RegExp(("^"+options.grouping)+'.*'+(options.grouping+'$'));
-														
-
-														
-														if (value.match(is_group) && value.match(new RegExp(options.grouping, "g")).length == 2) {
-															// If it's a closed group (just 2 grouping chars, different places)
-															return;
-														}else{
-														// Split the groups
-														value = split_groups(value);
-														}
-													}
-													
-												};
-												
-												// If text has separators
-												var tags;
-												if (value.constructor === Array) {
-													// If value is an Array, it's already splitted into tags
-													tags = value;
-												}else {
-													tags = value.split(options.separator);
+												var tags = split_tags(value);
+												if(!tags){ // This way we can cancel the event if no extra processing is needed. (e.g. unmatched grouping character)
+													return;
 												}
 				                tag = target.closest(settings.tag_class);
+												
 												target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
 												
 				                var next_tag = [];
