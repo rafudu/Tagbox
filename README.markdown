@@ -13,6 +13,8 @@ The simplest way to use Tagbox is to put this code inside a `script` tag:
 
 `	$('.tagbox').tag_box(); `
 
+Tagbox can be applied to input / textarea fields. They will be converted to div's.
+
 This way, when the user clicks on the `.tagbox` element, a new tag will be created to receive input. New tags are created automatically when user presses <ENTER>, <TAB> or ','.
 
 ##Parameters
