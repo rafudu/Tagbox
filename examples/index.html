@@ -164,6 +164,26 @@
 		<div class="tag_box groupings clearfix ">
 			
 		</div>
+		
+		<h2>Input fields and Textareas</h2>
+		<p>You can apply tagbox to input fields and textareas. They will be converted to div's.<a href="#grouping" rel="see_code">(see code)</a></p>
+		<code id="separators">
+	$('textarea.tag_box, input.tag_box').tag_box({
+		grouping: '"',
+		separator:/[\s]/
+	});
+		</code>
+		<textarea class="tag_box" name="tags[]">
+			This was a textarea
+		</textarea>
+		<input type="text" class="tag_box" value="This was an input field" />
+		<script type="text/javascript" charset="utf-8">
+			$('textarea.tag_box, input.tag_box').tag_box({
+				grouping: '"',
+				separator:/[\s]/
+			});
+		</script>
+		
 		<script type="text/javascript">
 		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

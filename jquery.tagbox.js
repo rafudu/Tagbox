@@ -25,27 +25,38 @@
             setup_tag(settings.tag, settings);
 
             this.each(function() {
-							$(this).click(function(e) {
+							var elm = $(this);
+							if ($(this).is(":input")) {
+
+								settings.name = this.name; // We use the input's name as the default name in this case
+								$(this).wrap(to_div.apply(this));
+								elm = elm.parent().text(elm.val());
+								
+								elm.find(':input').remove();
+								
+							};
+
+							elm.click(function(e) {
 							            // If you click the tagbox, a new tag is created
 							            $(this).append(new_tag()).find(settings.tag_class+':last input').focus();
 							            });
-							if ($.trim($(this).text())) {
-								var tags = split_tags($.trim($(this).text()));
-								$(this).text("");
-								var box = $(this);
+							if ($.trim(elm.text())) {
+								var tags = split_tags($.trim(elm.text()));
+								elm.text("");
+
 								$.each(tags, function(){
 									if($.trim(this)){
-										box.append(new_tag(this));
+										elm.append(new_tag(this));
 									}
 								})
-								// $(this).text("");
-								console.info(tags);
-								// $(this).append(new_tag(tags)).find(settings.tag_class).keyup();
+
 							};
 						})
 
-            // $(this).click();
-
+						
+						function to_div(){
+							return '<div class="'+this.className+'"></div>';
+						}
 
 						function sanitize(text){
 							return text.replace(/\s/g, '&nbsp;').replace("<", "&lt;") + "M"
@@ -119,6 +130,7 @@
 				        .clone(true) // Clone with events
 				        .find('input')
 				        .val(text)
+								.attr('name', settings.name)
 								.siblings('span')
 								.html(sanitize(text))
 				        .end()
