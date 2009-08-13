@@ -233,6 +233,7 @@
 
 				        })
 				        .find('input')
+								.focus(options.focus)
 				        .blur(options.blur)
 								.keydown(options.keydown)
 								.keyup(options.keyup)
