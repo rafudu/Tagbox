@@ -23,7 +23,7 @@
 								settings.autocomplete = split_tags(settings.autocomplete).sort();
 							}
 							else if(settings.autocomplete.constructor == Function){
-								// not implemented yet
+								// a function that returns a dictionary when it's called. 
 							}else {
 								// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
 							}
@@ -160,6 +160,10 @@
 							if (typeof word == "string") {
 								var word = new RegExp("^"+word,'i');
 							}
+							
+							if ($.isFunction(dictionary)) {
+								dictionary = split_tags(dictionary.call()).sort();
+							};
 							var results = [];
 							$.each(dictionary, function(i, tag) {
 								if (tag.match(word)) {
