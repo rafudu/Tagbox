@@ -8,7 +8,6 @@
             // It's possible to use multiple separators, like /[,;.]/
 						fx: true, // animation to remove the tag
 						container: "div" // the tag that wraps tagbox
-						 
         }
     };
 
@@ -147,6 +146,15 @@
 
 				            var target = $(e.target);
 				            if (target.is('abbr')) {
+											if (options.close) {
+												// If a custom close event is passed
+												var close_event = options.close.call(target, e, settings);
+												if (close_event === false) {
+													// if the event returns boolean, return the result. Allows user to cancel the default close action by returning false
+													return close_event;
+												};
+											};
+												
 				                // If is the 'close' button, hide the tag and remove
 												if (settings.fx) {
 													// animate if settings.fx
