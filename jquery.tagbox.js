@@ -1,21 +1,33 @@
 ; (function($) {
 
-    $.tag_box = {
+    $.tagbox = {
         defaults: {
             separator: /[,]/,
 						name: "tags[]",
 						className : "tag",
             // It's possible to use multiple separators, like /[,;.]/
 						fx: true, // animation to remove the tag
-						container: "div" // the tag that wraps tagbox
+						container: "div", // the tag that wraps tagbox
+						autocomplete: null // autocomplete dictionary
         }
     };
 
 
     $.fn.extend({
-        tag_box: function(settings) {
+        tagbox: function(settings) {
 						
-            settings = jQuery.extend({},$.tag_box.defaults, settings);
+            settings = jQuery.extend({},$.tagbox.defaults, settings);
+						if (settings.autocomplete){
+							if (settings.autocomplete.constructor == String || settings.autocomplete.constructor == Array) {
+								// If autocomplete is a string or an array, parse it as a dictionary and sort.
+								settings.autocomplete = split_tags(settings.autocomplete).sort();
+							}
+							else if(settings.autocomplete.constructor == Function){
+								// not implemented yet
+							}else {
+								// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
+							}
+						}
 						
 						settings.tag_class = '.'+settings.className;
             var content = this;
@@ -70,6 +82,9 @@
 						}
 						
 						function split_tags (text){
+							if (text.constructor != String) {
+								return text;
+							};
 							if (settings.grouping && text.indexOf(settings.grouping) !== -1) {
 								//If settings.grouping and matches grouping character											
 								
@@ -139,7 +154,40 @@
 				        .end()
 				.keyup();
 				    };
-
+						
+						function search_in_dictionary (word, dictionary) {
+							// Accepts a string or regexp term
+							if (typeof word == "string") {
+								var word = new RegExp("^"+word,'i');
+							}
+							var results = [];
+							$.each(dictionary, function(i, tag) {
+								if (tag.match(word)) {
+									results.push(tag);
+								};
+							})
+							return results;
+						}
+						
+						function autocomplete (textfield) {
+							
+							var current_index = textfield.selectionStart,
+							value = textfield.value.substr(0,current_index);
+							var regx = new RegExp("^"+value,'i');
+							
+							// Find the tag in the dictionary
+							var results = search_in_dictionary(value, settings.autocomplete);
+							if (results.length) {
+								//Default autocomplete
+								var result = results[0].replace(regx,"");
+								//if you're typing with the cursor in the middle of the string, do not autocomplete
+								if (value.substr(current_index+1,result.length+1) != result){
+									textfield.value = value.substr(0,current_index) + result+value.substr(current_index); 
+								}
+								textfield.setSelectionRange(current_index, current_index + result.length);
+							};
+						}
+						
 						function setup_tag(tag, options) {
 				        $(tag).click(function(e) {
 				            e.stopPropagation();
@@ -228,9 +276,21 @@
 				            }
 				        })
 				        
-				        .keyup(function() {
+				        .keyup(function(e) {
 				            var target = $(this),
 										value = this.value;
+										
+										//autocomplete
+
+										if ( options.autocomplete && String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) && value.length) {
+											  if (options.autocomplete.url) {
+												
+												};
+												autocomplete(this);
+											
+										};
+										
+										
 				            target.siblings('span').html(sanitize(this.value));
 				            // Add "M" to correct the tag size. Weird, but works! Using M because it's probally the widest character.
 				            if (value.match(options.separator)) {
