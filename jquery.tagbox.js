@@ -4,8 +4,11 @@
         defaults: {
             separator: /[,]/,
 						name: "tags[]",
-						className : "tag"
+						className : "tag",
             // It's possible to use multiple separators, like /[,;.]/
+						fx: true, // animation to remove the tag
+						container: "div" // the tag that wraps tagbox
+						 
         }
     };
 
@@ -20,7 +23,7 @@
             //Setting up the 'default' tag
             settings.tag = document.createElement('span');
             settings.tag.className = settings.className;
-            settings.tag.innerHTML = '<label><span></span><input type="text" name="'+settings.name+'" value=" " /><abbr title="Fechar">X</abbr></label>';
+            settings.tag.innerHTML = '<label><span></span><input type="text" name="'+settings.name+'" value=" " /><abbr title="close">x</abbr></label>';
 
             setup_tag(settings.tag, settings);
 
@@ -29,7 +32,7 @@
 							if ($(this).is(":input")) {
 
 								settings.name = this.name; // We use the input's name as the default name in this case
-								$(this).wrap(to_div.apply(this));
+								$(this).wrap(to_container_tag.apply(this));
 								elm = elm.parent().text(elm.val());
 								
 								elm.find(':input').remove();
@@ -54,8 +57,8 @@
 						})
 
 						
-						function to_div(){
-							return '<div class="'+this.className+'"></div>';
+						function to_container_tag(){
+							return '<'+settings.container+' class="'+this.className+'"></'+settings.container+'>';
 						}
 
 						function sanitize(text){
@@ -145,13 +148,20 @@
 				            var target = $(e.target);
 				            if (target.is('abbr')) {
 				                // If is the 'close' button, hide the tag and remove
-				                $(this).animate({
-				                    width: 'hide'
-				                },
-				                'fast',
-				                function() {
-				                    $(this).remove();
-				                });
+												if (settings.fx) {
+													// animate if settings.fx
+													$(this).animate({
+					                    width: 'hide'
+					                },
+					                'fast',
+					                function() {
+					                    $(this).remove();
+					                });
+												}else {
+													// or just remove, without animation
+													$(this).remove();
+												}
+				                
 
 				                return false;
 				            }
