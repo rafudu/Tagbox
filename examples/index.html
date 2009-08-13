@@ -30,13 +30,13 @@
 				height:0;
 			}
 			
-			.tag_box * {
+			.tagbox * {
 				margin: 0;
 				padding: 0;
 				outline: none;
 			}
 			
-			.tag_box {
+			.tagbox {
 				border: 1px solid #000;
 				margin: 10px 0;
 				min-height: 60px;
@@ -67,11 +67,15 @@
 		<script>
 		  // Load 
 		$(function(){
-			$('.tag_box.tags').tag_box();
-			$('.tag_box.separators').tag_box({
+			$('.tagbox.tags').tagbox();
+			$('.tagbox.autocomplete').tagbox({
+				autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
+				separator: /[ ]/
+			});
+			$('.tagbox.separators').tagbox({
 				separator: /[,.; ]/
 			});
-			$('.tag_box.colours').tag_box({ 
+			$('.tagbox.colours').tagbox({ 
 				className: "tag", 
 				keyup: function(e){
 					clearTimeout(this.colorTimeout);
@@ -82,7 +86,7 @@
 				}
 			});
 			
-			$('.tag_box.groupings').tag_box({
+			$('.tagbox.groupings').tagbox({
 				grouping: '"',
 				separator: /\s/, 
 			})
@@ -100,7 +104,7 @@
 		<p><a href="http://cloud.github.com/downloads/rafudu/Tagbox/tagbox.1.0.1.zip">download the latest release</a></p>
 		<p><a href="http://github.com/rafudu/Tagbox/tree/master">Project page on github</a></p>
 		<p>To create new tags, press ENTER, TAB or ','. You can also paste a comma-separated list (e.g. 1,2,3,4,5 ) and tagbox will split them into tags. The tag-separator character is customizable</p>
-		<div class="tag_box tags clearfix">
+		<div class="tagbox tags clearfix">
 			
 		</div>
 		<hr />
@@ -109,7 +113,7 @@
 		
 			<!-- <pre> -->
 				<code id="colours">
- $('.tag_colours').tag_box({ 
+ $('.tag_colours').tagbox({ 
  	keyup: function(e){
  		clearTimeout(this.colorTimeout);
  		this.colorTimeout = setTimeout(function() {
@@ -121,64 +125,75 @@
 			</code>
 		<!-- </pre> -->
 	
-		<div class="tag_box colours clearfix ">
+		<div class="tagbox colours clearfix ">
 			
 		</div>
 		<hr />
 		<h2>Separators</h2>
 		<p>Here we are using , ; . and space as our separators.<a href="#separators" rel="see_code">(see code)</a></p>
 		<code id="separators">
-	$('.tag_box.separators').tag_box({
+	$('.tagbox.separators').tagbox({
 		separator: /[,.; ]/
 	});
 		</code>
-		<div class="tag_box separators clearfix ">
+		<div class="tagbox separators clearfix ">
 
 		</div>
 
 		<h2>Initial value</h2>
 		<p>Tagbox checks if the div has any text and parse it into tags, using your settings.<a href="#grouping" rel="see_code">(see code)</a></p>
 		<code id="separators">
-	$('.tag_box.initial_value').tag_box({
+	$('.tagbox.initial_value').tagbox({
 		grouping: '"',
 		separator:/[\s]/
 	});
 		</code>
-		<div class="tag_box initial_value clearfix ">
+		<div class="tagbox initial_value clearfix ">
 			"New York" concert "Madison square garden" u2
 		</div>
 		<script type="text/javascript" charset="utf-8">
-			$('.tag_box.initial_value').tag_box({
+			$('.tagbox.initial_value').tagbox({
 				grouping: '"',
 				separator:/[\s]/
 			});
 		</script>
 		<h2>Grouping</h2>
 		<p>Here we are using space as our separator, but we group any text that's surrounded by double-quotes .<a href="#grouping" rel="see_code">(see code)</a></p>
-		<code id="separators">
-	$('.tag_box.separators').tag_box({
+		<code id="grouping">
+	$('.tagbox.separators').tagbox({
 		grouping: '"',
 		separator:/[\s]/
 	});
 		</code>
-		<div class="tag_box groupings clearfix ">
+		<div class="tagbox groupings clearfix ">
+			
+		</div>
+		<h2>Autocomplete</h2>
+		<p>You can pass a word list as a dictionary to autocomplete. The list will be transformed in an array of tags based on your separator settings. <a href="#autocomplete" rel="see_code">(see code)</a></p>
+		<code id="autocomplete">
+	$('.tagbox.autocomplete').tagbox({
+		autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
+		separator: /[ ]/
+	});
+			</code>
+		<div class="tagbox autocomplete clearfix ">
 			
 		</div>
 		
 		<h2>Input fields and Textareas</h2>
 		<p>You can apply tagbox to input fields and textareas. They will be converted to div's.<a href="#grouping" rel="see_code">(see code)</a></p>
 		<code id="separators">
-	$('textarea.tag_box, input.tag_box').tag_box({
+	$('textarea.tagbox, input.tagbox').tagbox({
 		grouping: '"',
 		separator:/[\s]/
 	});
 		</code>
-		<textarea class="tag_box" name="tags[]">
+		<textarea class="tagbox" name="tags[]">
 			This was a textarea
 		</textarea>
-		<input type="text" class="tag_box" value="This was an input field" />
+		<input type="text" class="tagbox" value="This was an input field" />
 		<script type="text/javascript" charset="utf-8">
-			$('textarea.tag_box, input.tag_box').tag_box({
+			$('textarea.tagbox, input.tagbox').tagbox({
 				grouping: '"',
 				separator:/[\s]/
 			});
