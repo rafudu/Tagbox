@@ -40,6 +40,8 @@
 
             this.each(function() {
 							var elm = $(this);
+
+							
 							if ($(this).is(":input")) {
 
 								settings.name = this.name; // We use the input's name as the default name in this case
@@ -49,7 +51,12 @@
 								elm.find(':input').remove();
 								
 							};
-
+							// only apply tagbox once
+							if (elm.attr('data-tagbox')) {
+								return;
+							}else {
+								elm.attr('data-tagbox', true);
+							}
 							elm.click(function(e) {
 							            // If you click the tagbox, a new tag is created
 							            $(this).append(new_tag()).find(settings.tag_class+':last input').focus();
@@ -82,7 +89,7 @@
 						}
 						
 						function split_tags (text){
-							if (text.constructor != String) {
+							if (!text || text.constructor != String) {
 								return text;
 							};
 							if (settings.grouping && text.indexOf(settings.grouping) !== -1) {
