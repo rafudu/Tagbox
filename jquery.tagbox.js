@@ -66,6 +66,7 @@
 									})
 									.bind('add_tag', function(e, text) {
 										if(!find_tag.call(this, text).length){
+											// if the tag doesn't exists
 											$(this).trigger('click', text);
 										}										
 									})
@@ -75,9 +76,12 @@
 
 									})
 									.bind('toggle_tag', function(e, text) {
+										suggestion = find_suggestion(text);
 										if(find_tag.call(this, text).length){
+											suggestion.removeClass('active')
 											$(this).trigger('remove_tag', text)
 										}else {
+											suggestion.addClass('active');
 											$(this).trigger('add_tag', text)
 										}
 									})
@@ -111,9 +115,7 @@
 								//Bind a live event for the suggestions
 								$(settings.suggestion_links).live('click', function(e) {
 									e.preventDefault();
-								  $(this).toggleClass('active')
 								  elm.trigger('toggle_tag', $(this).text());
-								  
 								})
 							};
 							
@@ -123,6 +125,12 @@
 							return $(this).find(settings.tag_class+' input').filter(function() {
 									return $(this).val() == text
 							}).closest(settings.tag_class);
+						}
+						
+						function find_suggestion (text) {
+							return $(settings.suggestion_links).filter(function() {
+								return $(this).text() == text
+							})
 						}
 						function to_container_tag(){
 							return '<'+settings.container+' class="'+this.className+'"></'+settings.container+'>';
@@ -253,16 +261,17 @@
 				            e.stopPropagation();
 
 				            var target = $(e.target);
-				            if (target.is('abbr')) {
+				            if (target.is('.close')) {
 											if (options.close) {
-												// If a custom close event is passed
+												// If a custom close event is passed, call it
 												var close_event = options.close.call(target, e, settings);
 												if (close_event === false) {
 													// if the event returns boolean, return the result. Allows user to cancel the default close action by returning false
 													return close_event;
 												};
 											};
-												
+												//deactivate the suggestion for this tag, if exists
+												find_suggestion($(this).closest(settings.tag_class).find('input').val()).removeClass('active')
 				                // If is the 'close' button, hide the tag and remove
 												if (settings.fx) {
 													// animate if settings.fx
@@ -278,7 +287,7 @@
 													$(this).remove();
 												}
 				                
-
+												
 				                return false;
 				            }
 				            if (target.is(settings.tag_class)) {
@@ -293,7 +302,12 @@
 				        .blur(options.blur)
 								.keydown(options.keydown)
 								.keyup(options.keyup)
+								.focus(function(e) {
+									// Store the value to activate / deactivate the suggestions
+									this.initialValue = this.value;
+								})
 				        .blur(function(e) {
+									console.info(e);
 				            if (!$.trim($(this).val())) {
 				                // If empty, remove the tag
 				                setTimeout(function() {
@@ -301,7 +315,14 @@
 				                },
 				                100);
 				                // This timeout is necessary for safari.
-				            }
+											
+				            }else if(options.suggestion_links) {
+											// If not empty, activate and deactivate the suggestions
+											if (this.initialValue != this.value ) { // Get the initial value and deactivate
+												find_suggestion(this.initialValue).removeClass('active');
+											};
+											find_suggestion(this.value).addClass('active'); // Get the current value and activate
+										}
 				        })
 				        
 				        .keydown(function(e) {
@@ -332,7 +353,7 @@
 				                        tag.next(settings.tag_class).find('input').focus();
 				                    },
 				                    50);
-				                    return false;
+				                    return true;
 				                }
 				            }
 				        })
