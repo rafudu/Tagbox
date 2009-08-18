@@ -58,12 +58,13 @@
 								elm.attr('data-tagbox', true);
 							}
 							elm.click(function(e, text) {
-						            // If you click the tagbox, a new tag is created
-													console.info(text,new_tag(text));
-							            $(this).append(new_tag(text)).find(settings.tag_class+':last input').focus();
-							            })
+						      // If you click the tagbox, a new tag is created
+							     $(this).append(new_tag(text)).find(settings.tag_class+':last input').focus();								            			 
+									})
 									.bind('add_tag', function(e, text) {
-										$(this).trigger('click', text);
+										if(!find_tag.call(this, text).length){
+											$(this).trigger('click', text);
+										}										
 									})
 									.bind('remove_tag', function(e, text) {
 										
@@ -87,8 +88,12 @@
 										elm.append(new_tag(this));
 									}
 								})
-
+								// Only call INIT if has tags
+								if ($.isFunction(settings.init)) {
+									settings.init.call(this, tags)
+								};
 							};
+							
 						})
 
 						function find_tag (text) {
