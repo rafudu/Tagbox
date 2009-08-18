@@ -68,6 +68,11 @@
 		  // Load 
 		$(function(){
 			$('.tagbox.tags').tagbox();
+			$('.tagbox.suggestions').tagbox();
+			$('p.suggestions a').click(function(e) {
+			  $('.tagbox.suggestions').trigger('toggle_tag', $(this).text());
+			  return false;
+			})
 			$('.tagbox.autocomplete').tagbox({
 				autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
 				separator: /[ ]/
@@ -177,6 +182,19 @@
 	});
 			</code>
 		<div class="tagbox autocomplete clearfix ">
+			
+		</div>
+		
+		<h2>Tag suggestions</h2>
+		<p>. <a href="#suggestions" rel="see_code">(see code)</a></p>
+		<code id="suggestions">
+	$('.tagbox.autocomplete').tagbox({
+		autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
+		separator: /[ ]/
+	});
+			</code>
+			<p class="suggestions"><a href="#">javascript</a>, <a href="#">plugin</a>, <a href="#">jquery</a></p>
+		<div class="tagbox suggestions clearfix ">
 			
 		</div>
 		

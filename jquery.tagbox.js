@@ -34,7 +34,7 @@
             //Setting up the 'default' tag
             settings.tag = document.createElement('span');
             settings.tag.className = settings.className;
-            settings.tag.innerHTML = '<label><span></span><input type="text" name="'+settings.name+'" value=" " /><abbr title="close">x</abbr></label>';
+            settings.tag.innerHTML = '<label><span></span><input type="text" name="'+settings.name+'" value=" " /><abbr class="close" title="close">x</abbr></label>';
 
             setup_tag(settings.tag, settings);
 
@@ -57,10 +57,27 @@
 							}else {
 								elm.attr('data-tagbox', true);
 							}
-							elm.click(function(e) {
-							            // If you click the tagbox, a new tag is created
-							            $(this).append(new_tag()).find(settings.tag_class+':last input').focus();
-							            });
+							elm.click(function(e, text) {
+						            // If you click the tagbox, a new tag is created
+													console.info(text,new_tag(text));
+							            $(this).append(new_tag(text)).find(settings.tag_class+':last input').focus();
+							            })
+									.bind('add_tag', function(e, text) {
+										$(this).trigger('click', text);
+									})
+									.bind('remove_tag', function(e, text) {
+										
+										find_tag.call(this, text).remove();
+
+									})
+									.bind('toggle_tag', function(e, text) {
+										if(find_tag.call(this, text).length){
+											$(this).trigger('remove_tag', text)
+										}else {
+											$(this).trigger('add_tag', text)
+										}
+									})
+									
 							if ($.trim(elm.text())) {
 								var tags = split_tags($.trim(elm.text()));
 								elm.text("");
@@ -74,7 +91,11 @@
 							};
 						})
 
-						
+						function find_tag (text) {
+							return $(this).find(settings.tag_class+' input').filter(function() {
+									return $(this).val() == text
+							}).closest(settings.tag_class);
+						}
 						function to_container_tag(){
 							return '<'+settings.container+' class="'+this.className+'"></'+settings.container+'>';
 						}
@@ -152,14 +173,14 @@
 
 				        return $(settings.tag)
 				        .clone(true) // Clone with events
-				        .find('input')
-				        .val(text)
-								.attr('name', settings.name)
-								.siblings('span')
-								.html(sanitize(text))
-				        .end()
-				        .end()
-				.keyup();
+				        	.find('input')
+				        		.val(text)
+										.attr('name', settings.name)
+											.siblings('span')
+												.html(sanitize(text))
+				        			.end()
+				        		.end()
+								.keyup();
 				    };
 						
 						function search_in_dictionary (word, dictionary) {
