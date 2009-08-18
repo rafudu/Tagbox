@@ -95,9 +95,9 @@
 								// If have suggestion links, check if any of the suggestions matches the current tags
 								if (settings.suggestion_links) {
 					          $(settings.suggestion_links).each(function() {
-					            elm = $(this);
-					            if($.inArray(elm.text(), tags) !== -1){
-					              elm.addClass('active');
+					            link = $(this);
+					            if($.inArray(link.text(), tags) !== -1){
+					              link.addClass('active');
 					            }
 					          })
 								};
