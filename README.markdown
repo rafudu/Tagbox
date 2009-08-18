@@ -11,7 +11,7 @@ Tagbox is a simple tagging plugin for jQuery.
 
 The simplest way to use Tagbox is to put this code inside a `script` tag:
 
-`	$('.tagbox').tag_box(); `
+`	$('.tagbox').tagbox(); `
 
 Tagbox can be applied to input / textarea fields. They will be converted to div's.
 
@@ -20,12 +20,12 @@ This way, when the user clicks on the `.tagbox` element, a new tag will be creat
 ##Parameters
 
 * `classname`:_String_. The html class name of the tag (default: 'tag')
-* `name`:_String_. The text field name (default: 'tags[]')
+* `name`:_String_. The text field name (default: none)
 * `separator`:_RegExp_. Expression to split the text field text into new tags. (default: /[,]/ [comma])
 * `grouping`:_String_. Character to group tags (a separator don't create a new tag when placed inside a group). (default: none)
 
 // Tags separated by space, grouped by double-quotes with custom input name and class.
-	$('.tagbox').tag_box({
+	$('.tagbox').tagbox({
 		separator: /\s/,
 		grouping: '"',
 		className: 'recipients',
@@ -37,14 +37,14 @@ This way, when the user clicks on the `.tagbox` element, a new tag will be creat
 
 You can customize the separator character. If you want space separated tags, just use:
 
-	$('.tagbox').tag_box({
+	$('.tagbox').tagbox({
 		separator: /\s/
 	});
 
 
 The `separator` parameter is a regular expression. We also support multiple separators, like:
 
-	$('.tagbox').tag_box({
+	$('.tagbox').tagbox({
 		separator: /[,; ]/
 	});
 
@@ -54,7 +54,7 @@ This way, we are splitting tags by ',' , ';' and space.
 
 If you need tags grouped by quotes, just pass a string to the `grouping` parameter. Let's say you want space-separated tags, but grouped by quotes:
 
-	$('.tagbox').tag_box({
+	$('.tagbox').tagbox({
 		separator: /\s/,
 		grouping: '"'
 	}); 

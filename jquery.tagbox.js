@@ -3,7 +3,7 @@
     $.tagbox = {
         defaults: {
             separator: /[,]/,
-						name: "tags[]",
+
 						className : "tag",
             // It's possible to use multiple separators, like /[,;.]/
 						fx: true, // animation to remove the tag
@@ -46,7 +46,7 @@
 							
 							if ($(this).is(":input")) {
 
-								settings.name = this.name; // We use the input's name as the default name in this case
+								settings.name = settings.name || this.name; // We use the input's name as the default name in this case
 								$(this).wrap(to_container_tag.apply(this));
 								elm = elm.parent().text(elm.val());
 								
