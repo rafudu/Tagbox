@@ -78,24 +78,8 @@
 		$(function(){
 			$('.tagbox.tags').tagbox();
 			$('.tagbox.suggestions').tagbox({
-			  init: function(tags) {
-			    var tagbox = $(this);
-			    if(!tags){
-			      return;
-			    }
-          $('p.suggestions a').each(function() {
-            elm = $(this);
-            if($.inArray(elm.text(), tags) !== -1){
-              elm.addClass('active');
-            }
-          })
-			  }
+			  suggestion_links: 'p.suggestions a'
 			});
-			$('p.suggestions a').click(function(e) {
-			  $(this).toggleClass('active')
-			  $('.tagbox.suggestions').trigger('toggle_tag', $(this).text());
-			  return false;
-			})
 			$('.tagbox.autocomplete').tagbox({
 				autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
 				separator: /[ ]/
@@ -234,7 +218,7 @@
   })
 			</code>
 			<p class="suggestions"><a href="#">javascript</a>, <a href="#">plugin</a>, <a href="#">jquery</a></p>
-		<div class="tagbox suggestions clearfix ">
+		<div class="tagbox suggestions clearfix ">javascript
 		</div>
 		
 		<h2>Input fields and Textareas</h2>

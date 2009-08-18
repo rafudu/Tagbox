@@ -8,7 +8,8 @@
             // It's possible to use multiple separators, like /[,;.]/
 						fx: true, // animation to remove the tag
 						container: "div", // the tag that wraps tagbox
-						autocomplete: null // autocomplete dictionary
+						autocomplete: null, // autocomplete dictionary
+						suggestion_links: null // links with suggestions
         }
     };
 
@@ -28,7 +29,7 @@
 								// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
 							}
 						}
-						
+
 						settings.tag_class = '.'+settings.className;
             var content = this;
             //Setting up the 'default' tag
@@ -39,6 +40,7 @@
             setup_tag(settings.tag, settings);
 
             this.each(function() {
+
 							var elm = $(this);
 
 							
@@ -57,6 +59,7 @@
 							}else {
 								elm.attr('data-tagbox', true);
 							}
+
 							elm.click(function(e, text) {
 						      // If you click the tagbox, a new tag is created
 							     $(this).append(new_tag(text)).find(settings.tag_class+':last input').focus();								            			 
@@ -78,8 +81,9 @@
 											$(this).trigger('add_tag', text)
 										}
 									})
-									
+
 							if ($.trim(elm.text())) {
+								// If the elm has any text, parse it into tags
 								var tags = split_tags($.trim(elm.text()));
 								elm.text("");
 
@@ -88,10 +92,29 @@
 										elm.append(new_tag(this));
 									}
 								})
+								// If have suggestion links, check if any of the suggestions matches the current tags
+								if (settings.suggestion_links) {
+					          $(settings.suggestion_links).each(function() {
+					            elm = $(this);
+					            if($.inArray(elm.text(), tags) !== -1){
+					              elm.addClass('active');
+					            }
+					          })
+								};
 								// Only call INIT if has tags
 								if ($.isFunction(settings.init)) {
 									settings.init.call(this, tags)
 								};
+							};
+							
+							if (settings.suggestion_links) {
+								//Bind a live event for the suggestions
+								$(settings.suggestion_links).live('click', function(e) {
+									e.preventDefault();
+								  $(this).toggleClass('active')
+								  elm.trigger('toggle_tag', $(this).text());
+								  
+								})
 							};
 							
 						})
