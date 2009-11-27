@@ -63,8 +63,8 @@ span.tag label.verde.bandeira {
 	background: #00AE00;
 }
 span.tag label.green *,
-span.tag label.green abbr,
-span.tag label.verde abbr,
+span.tag label.green small,
+span.tag label.verde small,
 span.tag label.verde * {
 	color:#FFF;
 }
