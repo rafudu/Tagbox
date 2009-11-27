@@ -5,7 +5,7 @@
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<title>tagbox</title>
 
-		<link rel="stylesheet" href="tags.css" type="text/css" media="screen" title="no title" charset="utf-8">		
+		<link rel="stylesheet" href="../css/tags.css" type="text/css" media="screen" title="no title" charset="utf-8">		
 		<style type="text/css" media="screen">
 		body {
 			font-family: "helvetica";
@@ -100,7 +100,7 @@
 			
 			$('.tagbox.groupings').tagbox({
 				grouping: '"',
-				separator: /\s/, 
+				separator: /\s/
 			})
 			$('a[rel=see_code]').click(function() {
 				$(this).parent().next('code').slideToggle('fast');
