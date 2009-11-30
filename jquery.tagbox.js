@@ -32,12 +32,10 @@
 
 						settings.tag_class = '.'+settings.className;
 						var content = this;
-						//Setting up the 'default' tag
-						settings.tag = document.createElement('span');
-						settings.tag.className = settings.className;
-						settings.tag.innerHTML = '<label><span></span><input type="text" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label>';
+						//Setting up the 'default' tag, witch is, an original DOM element that is never inserted, only cloned
+						settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
 
-						setup_tag(settings.tag, settings);
+						setup_tag(settings);
 
 						this.each(function() {
 
@@ -127,11 +125,6 @@
 							}).closest(settings.tag_class);
 						}
 						
-						function find_suggestion (text) {
-							return $(settings.suggestion_links).filter(function() {
-								return $(this).text() == text
-							})
-						}
 						function to_container_tag(){
 							return '<'+settings.container+' class="'+this.className+'"></'+settings.container+'>';
 						}
@@ -207,6 +200,7 @@
 						function new_tag(text) {
 							var text = text || "",
 								$tag = $(settings.tag).clone(true); // Clone with events
+							$.data($tag.get(0),'settings',settings);
 							$tag.find('input')
 								.siblings('span').html(sanitize(text))
 								.end().val(text).attr('name', settings.name);
@@ -250,162 +244,194 @@
 							};
 						}
 						
-						function setup_tag(tag, options) {
-								$(tag).click(function(e) {
-										e.stopPropagation();
-
-										var target = $(e.target);
-										if (target.is('.close')) {
-											if (options.close) {
-												// If a custom close event is passed, call it
-												var close_event = options.close.call(target, e, settings);
-												if (close_event === false) {
-													// if the event returns boolean, return the result. Allows user to cancel the default close action by returning false
-													return close_event;
-												};
-											};
-												//deactivate the suggestion for this tag, if exists
-												find_suggestion($(this).closest(settings.tag_class).find('input').val()).removeClass('active')
-												// If is the 'close' button, hide the tag and remove
-												if (settings.fx) {
-													// animate if settings.fx
-													$(this).animate({
-															width: 'hide'
-													},
-													'fast',
-													function() {
-															$(this).remove();
-													});
-												}else {
-													// or just remove, without animation
-													$(this).remove();
-												}
-												
-												
-												return false;
-										}
-										if (target.is(settings.tag_class)) {
-												// The space between the tags is actually the <span> element. If you clicked, you clicked between tags.
-												target.before(new_tag());
-												target.prev(settings.tag_class).find(':input').focus();
-										}
-
-								})
-								.find('input')
-								.focus(options.focus)
-								.blur(options.blur)
-								.keydown(options.keydown)
-								.keyup(options.keyup)
-								.focus(function(e) {
-									// Store the value to activate / deactivate the suggestions
-									this.initialValue = this.value;
-								})
-								.blur(function(e) {
-									try{console.info(e);}catch(e){}
-									if (!$.trim($(this).val())) {
-											// If empty, remove the tag
-											setTimeout(function() {
-													$(e.target).closest(settings.tag_class).remove();
-											},
-											100);
-											// This timeout is necessary for safari.
-										
-									}else if(options.suggestion_links) {
-										// If not empty, activate and deactivate the suggestions
-										if (this.initialValue != this.value ) { // Get the initial value and deactivate
-											find_suggestion(this.initialValue).removeClass('active');
-										};
-										find_suggestion(this.value).addClass('active'); // Get the current value and activate
-									}
-								})
-								
-								.keydown(function(e) {
-										if(e.keyCode == 8 ) {
-											// If BACKSPACE
-											if (!$.trim($(this).val())) {
-												var tag = $(this).closest(settings.tag_class),
-												prev_tag = tag.prev(settings.tag_class);
-												if(prev_tag.length){
-													prev_tag.find(':input').focus();
-													tag.remove();
-													e.preventDefault();
-												}
-												
-											};
-											
-										}
-										if (e.keyCode == 13) {
-												// If ENTER key, do not submit.
-												e.preventDefault();
-										}
-										if (e.keyCode == 9 || e.keyCode == 13) {
-												// if TAB or ENTER
-												if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
-														// And it's not shift+tab, and do not have a next tag
-														var tag = $(this).closest(settings.tag_class).after(new_tag());
-														setTimeout(function() {
-																tag.next(settings.tag_class).find('input').focus();
-														},
-														50);
-														return true;
-												}
-										}
-								})
-								
-								.keyup(function(e) {
-										var target = $(this),
-										value = this.value;
-										
-										//autocomplete
-
-										if ( options.autocomplete && String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) && value.length) {
-												if (options.autocomplete.url) {
-												
-												};
-												autocomplete(this);
-											
-										};
-										
-										
-										target.siblings('span').html(sanitize(this.value));
-										// Add "M" to correct the tag size. Weird, but works! Using M because it's probally the widest character.
-										if ((options.separator).test(value)) {
-												// If text has separators
-												
-												
-												var tags = split_tags(value);
-												if(!tags){ // This way we can cancel the event if no extra processing is needed. (e.g. unmatched grouping character)
-													return;
-												}
-												if(tags.length===1) {
-													// IE creates a 1 sized array, others create an 2 sized array with second item as empty sting
-													tags.push('');
-												}
-												tag = target.closest(settings.tag_class);
-												
-												target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
-												
-												var next_tag = [];
-												for (var i = tags.length - 1; i > 0; i--) {
-														
-														next_tag.push($(tag).after(new_tag(tags[i])).next());
-														// Create new tags for each separator
-												};
-												// Focus the last shown (first created) tag
-												next_tag.shift().find('input').focus();
-				
-												if (!$.trim(tags[0])) { //If the first tag is empty, remove
-													tag.remove();
-												}
-				
-												
-										}
-								})
-						}
-
 
 				}
 		});
+		
+		function setup_tag(settings) {
+			$(settings.tag)
+				.click(internal_click)
+				.find('input')
+				.focus(settings.focus)
+				.blur(settings.blur)
+				.keydown(settings.keydown)
+				.keyup(settings.keyup)
+				.focus(internal_focus)
+				.blur(internal_blur)
+				.keydown(internal_keydown)
+				.keyup(internal_keyup);
+		}
+
+		// search the dom for settings stored with $.data()
+		function get_settings(elem) {
+			var ret,
+				elem = elem instanceof jQuery?$(elem).get(0):elem, // find element
+				set = $.data(elem,'settings'); // get settings, if exists
+			if(typeof set != 'undefined' && set.hasOwnProperty('separator')) {
+				// found. return it
+				ret = set;
+			} else {
+				// recurse up the DOM
+				ret = get_settings(elem.parentNode);
+			}
+			return ret;
+		};
+		
+		function find_suggestion (text, settings) {
+			return $(settings.suggestion_links).filter(function() {
+				return $(this).text() == text
+			})
+		}
+		
+		
+		function internal_click(e) {
+				e.stopPropagation();
+				settings = get_settings(e.target);
+
+				var target = $(e.target);
+				if (target.is('.close')) {
+					if (settings.close) {
+						// If a custom close event is passed, call it
+						var close_event = settings.close.call(target, e, settings);
+						if (close_event === false) {
+							// if the event returns boolean, return the result. Allows user to cancel the default close action by returning false
+							return close_event;
+						};
+					};
+						//deactivate the suggestion for this tag, if exists
+						find_suggestion($(this).closest(settings.tag_class).find('input').val(), settings).removeClass('active')
+						// If is the 'close' button, hide the tag and remove
+						if (settings.fx) {
+							// animate if settings.fx
+							$(this).animate({
+									width: 'hide'
+							},
+							'fast',
+							function() {
+									$(this).remove();
+							});
+						}else {
+							// or just remove, without animation
+							$(this).remove();
+						}
+						
+						
+						return false;
+				}
+				if (target.is(settings.tag_class)) {
+						// The space between the tags is actually the <span> element. If you clicked, you clicked between tags.
+						target.before(new_tag());
+						target.prev(settings.tag_class).find(':input').focus();
+				}
+
+		};
+		
+		function internal_focus(e) {
+			// Store the value to activate / deactivate the suggestions
+			this.initialValue = this.value;
+		};
+		
+		function internal_blur(e) {
+			try{console.info(e);}catch(e){}
+			if (!$.trim($(this).val())) {
+					// If empty, remove the tag
+					setTimeout(function() {
+							$(e.target).closest(settings.tag_class).remove();
+					},
+					100);
+					// This timeout is necessary for safari.
+				
+			}else if(settings.suggestion_links) {
+				// If not empty, activate and deactivate the suggestions
+				if (this.initialValue != this.value ) { // Get the initial value and deactivate
+					find_suggestion(this.initialValue).removeClass('active');
+				};
+				find_suggestion(this.value).addClass('active'); // Get the current value and activate
+			}
+		};
+		
+		function internal_keydown(e) {
+				if(e.keyCode == 8 ) {
+					// If BACKSPACE
+					if (!$.trim($(this).val())) {
+						var tag = $(this).closest(settings.tag_class),
+						prev_tag = tag.prev(settings.tag_class);
+						if(prev_tag.length){
+							prev_tag.find(':input').focus();
+							tag.remove();
+							e.preventDefault();
+						}
+						
+					};
+					
+				}
+				if (e.keyCode == 13) {
+						// If ENTER key, do not submit.
+						e.preventDefault();
+				}
+				if (e.keyCode == 9 || e.keyCode == 13) {
+						// if TAB or ENTER
+						if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
+								// And it's not shift+tab, and do not have a next tag
+								var tag = $(this).closest(settings.tag_class).after(new_tag());
+								setTimeout(function() {
+										tag.next(settings.tag_class).find('input').focus();
+								},
+								50);
+								return true;
+						}
+				}
+		};
+		
+		function internal_keyup(e) {
+				var target = $(this),
+				value = this.value;
+				
+				//autocomplete
+
+				if ( settings.autocomplete && String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) && value.length) {
+						if (settings.autocomplete.url) {
+						
+						};
+						autocomplete(this);
+					
+				};
+				
+				
+				target.siblings('span').html(sanitize(this.value));
+				// Add "M" to correct the tag size. Weird, but works! Using M because it's probally the widest character.
+				if ((settings.separator).test(value)) {
+						// If text has separators
+						
+						
+						var tags = split_tags(value);
+						if(!tags){ // This way we can cancel the event if no extra processing is needed. (e.g. unmatched grouping character)
+							return;
+						}
+						if(tags.length===1) {
+							// IE creates a 1 sized array, others create an 2 sized array with second item as empty sting
+							tags.push('');
+						}
+						tag = target.closest(settings.tag_class);
+						
+						target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
+						
+						var next_tag = [];
+						for (var i = tags.length - 1; i > 0; i--) {
+								
+								next_tag.push($(tag).after(new_tag(tags[i])).next());
+								// Create new tags for each separator
+						};
+						// Focus the last shown (first created) tag
+						next_tag.shift().find('input').focus();
+
+						if (!$.trim(tags[0])) { //If the first tag is empty, remove
+							tag.remove();
+						}
+
+						
+				}
+		};
 
 		
 } (jQuery));
