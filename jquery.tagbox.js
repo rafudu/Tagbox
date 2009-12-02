@@ -14,45 +14,45 @@
 	$.fn.extend({
 		tagbox: function(settings) {
 			
-			settings = jQuery.extend({},$.tagbox.defaults, settings);
-			if (settings.autocomplete){
-				if (settings.autocomplete.constructor == String || settings.autocomplete.constructor == Array) {
-					// If autocomplete is a string or an array, parse it as a dictionary and sort.
-					settings.autocomplete = split_tags(settings.autocomplete).sort();
-				}
-				else if(settings.autocomplete.constructor == Function){
-					// a function that returns a dictionary when it's called. 
-				}else {
-					// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
-				}
-			}
-
-			settings.tag_class = '.'+settings.className;
-			var content = this;
-			//Setting up the 'default' tag, witch is, an original DOM element that is never inserted, only cloned
-			settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
-			setup_tag(settings);
-
 			this.each(function() {
-				var elm = $(this);
+				var $box = $(this);
 
-				if ($(this).is(":input")) {
+				settings = jQuery.extend({},$.tagbox.defaults, settings);
+				if (settings.autocomplete){
+					if (settings.autocomplete.constructor == String || settings.autocomplete.constructor == Array) {
+						// If autocomplete is a string or an array, parse it as a dictionary and sort.
+						settings.autocomplete = split_tags(settings.autocomplete).sort();
+					}
+					else if(settings.autocomplete.constructor == Function){
+						// a function that returns a dictionary when it's called. 
+					}else {
+						// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
+					}
+				}
+
+				settings.tag_class = '.'+settings.className;
+				var content = this;
+				//Setting up the 'default' tag, witch is, an original DOM element that is never inserted, only cloned
+				settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
+				setup_tag(settings);
+
+				if ($box.is(":input")) {
 
 					settings.name = settings.name || this.name; // We use the input's name as the default name in this case
-					$(this).wrap(to_container_tag.apply(this));
-					elm = elm.parent().text(elm.val());
-					
-					elm.find(':input').remove();
+					var $old = $box;
+					$box.wrap('<'+settings.container+' class="'+this.className+'"></'+settings.container+'>');
+					$box = $box.parent().text($box.val());
+					$old.remove();
 					
 				};
 				// only apply tagbox once
-				if (elm.attr('data-tagbox')) {
+				if ($.data($box.get(0),'settings')) {
 					return;
-				}else {
-					elm.attr('data-tagbox', true);
 				}
+				// store settings so functions outside the init code can find it
+				$.data($box.get(0),'settings',settings);
 
-				elm
+				$box
 					.click(function(e, text) {
 						// If you click the tagbox, a new tag is created
 						 $(this).append(new_tag(text)).find(settings.tag_class+':last input').focus();																	 
@@ -79,14 +79,14 @@
 						}
 					});
 
-				if ($.trim(elm.text())) {
-					// If the elm has any text, parse it into tags
-					var tags = split_tags($.trim(elm.text()));
-					elm.text("");
+				if ($.trim($box.text())) {
+					// If the $box has any text, parse it into tags
+					var tags = split_tags($.trim($box.text()));
+					$box.text("");
 
 					$.each(tags, function(){
 						if($.trim(this)){
-							elm.append(new_tag(this));
+							$box.append(new_tag(this));
 						}
 					});
 					// If have suggestion links, check if any of the suggestions matches the current tags
@@ -108,7 +108,7 @@
 					//Bind a live event for the suggestions
 					$(settings.suggestion_links).live('click', function(e) {
 						e.preventDefault();
-						elm.trigger('toggle_tag', $(this).text());
+						$box.trigger('toggle_tag', $(this).text());
 					});
 				};
 				
@@ -120,10 +120,6 @@
 				}).closest(settings.tag_class);
 			};
 			
-			function to_container_tag(){
-				return '<'+settings.container+' class="'+this.className+'"></'+settings.container+'>';
-			};
-
 			function sanitize(text){
 				return text.replace(/\s/g, '&nbsp;').replace("<", "&lt;") + "M"
 			};
@@ -189,7 +185,7 @@
 			function new_tag(text) {
 				var text = text || "",
 					$tag = $(settings.tag).clone(true); // Clone with events
-				$.data($tag.get(0),'settings',settings);
+				// $.data($tag.get(0),'settings',settings);
 				$tag.find('input')
 					.siblings('span').html(sanitize(text))
 					.end().val(text).attr('name', settings.name);
@@ -204,13 +200,13 @@
 				
 				if ($.isFunction(dictionary)) {
 					dictionary = split_tags(dictionary.call()).sort();
-				};
+				}
 				var results = [];
 				$.each(dictionary, function(i, tag) {
 					if (tag.match(word)) {
 						results.push(tag);
 					};
-				})
+				});
 				return results;
 			};
 			
