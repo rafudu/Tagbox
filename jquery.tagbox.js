@@ -5,7 +5,7 @@
 			separator: /[,]/, // It's possible to use multiple separators, like /[,;.]/
 			className : "tag", // without preciding .
 			fx: true, // animation to remove the tag
-			container: "div", // the tag that wraps tagbox
+			container: "div", // the tag that wraps tagbox, must be block level or with display:block in CSS
 			autocomplete: null, // autocomplete dictionary
 			suggestion_links: null // links with suggestions
 		}
@@ -13,15 +13,18 @@
 
 	$.fn.extend({
 		tagbox: function(settings) {
+			// object to preserve chainability
+			var $chain = this;
+			var remove_from_chain=[];
 			
-			this.each(function() {
+			this.each(function init_box() {
 				var $box = $(this);
 
 				settings = jQuery.extend({},$.tagbox.defaults, settings);
 				if (settings.autocomplete){
 					if (settings.autocomplete.constructor == String || settings.autocomplete.constructor == Array) {
 						// If autocomplete is a string or an array, parse it as a dictionary and sort.
-						settings.autocomplete = split_tags(settings.autocomplete).sort();
+						settings.autocomplete = split_tags(settings.autocomplete, settings).sort();
 					}
 					else if(settings.autocomplete.constructor == Function){
 						// a function that returns a dictionary when it's called. 
@@ -36,12 +39,19 @@
 				settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
 				setup_tag(settings);
 
+				// transform inputs into some block level element
 				if ($box.is(":input")) {
-
-					settings.name = settings.name || this.name; // We use the input's name as the default name in this case
 					var $old = $box;
+					// keep name attr
+					settings.name = settings.name || this.name; // We use the input's name as the default name in this case
+					// create new element
 					$box.wrap('<'+settings.container+' class="'+this.className+'"></'+settings.container+'>');
+					// import string
 					$box = $box.parent().text($box.val());
+					// preserve chainability
+					$chain.push($box.get(0));
+					remove_from_chain.push($old.get(0)); // queue for later removal, since we are inside the jQuery.each protected loop
+					// remove from the DOM
 					$old.remove();
 					
 				};
@@ -55,7 +65,7 @@
 				$box
 					.click(function(e, text) {
 						// If you click the tagbox, a new tag is created
-						 $(this).append(new_tag(text)).find(settings.tag_class+':last input').focus();																	 
+						 $(this).append(new_tag(text, settings)).find(settings.tag_class+':last input').focus();																	 
 					})
 					.bind('add_tag', function(e, text) {
 						if(!find_tag.call(this, text).length){
@@ -81,12 +91,12 @@
 
 				if ($.trim($box.text())) {
 					// If the $box has any text, parse it into tags
-					var tags = split_tags($.trim($box.text()));
+					var tags = split_tags($.trim($box.text()), settings);
 					$box.text("");
 
 					$.each(tags, function(){
 						if($.trim(this)){
-							$box.append(new_tag(this));
+							$box.append(new_tag(this, settings));
 						}
 					});
 					// If have suggestion links, check if any of the suggestions matches the current tags
@@ -113,6 +123,21 @@
 				};
 				
 			});
+			
+			// return the chain after removing unused objects
+			// this is needed becouse we transform :inputs into choosen dom elements (defaults div);
+			return $chain.filter(function(index){
+				var keep = true;
+				for(var i=0;i<remove_from_chain.length;i++) {
+					if(remove_from_chain[i] == $chain.get(index)) {
+						keep = false;
+					}
+				}
+				return keep;
+			});
+			
+			// internal functions
+			// TODO: memory menagement - move this functions outsite the .tagbox() function.
 
 			function find_tag (text) {
 				return $(this).find(settings.tag_class+' input').filter(function() {
@@ -120,43 +145,9 @@
 				}).closest(settings.tag_class);
 			};
 			
-			function sanitize(text){
-				return text.replace(/\s/g, '&nbsp;').replace("<", "&lt;") + "M"
-			};
-
 			function set_label(tag, text){
 				tag.find('input').val(text).siblings('span').html(sanitize(text));
 				return tag;
-			};
-			
-			function split_tags (text){
-				if (!text || text.constructor != String) {
-					return text;
-				};
-				if (settings.grouping && text.indexOf(settings.grouping) !== -1) {
-					//If settings.grouping and matches grouping character											
-					var groupings = [text.indexOf(settings.grouping), text.lastIndexOf(settings.grouping)]
-					// Store the locations of the grouping characters.
-					if (groupings[0] == groupings[1]){ // Has a grouping char, but not terminated. The first and last occurrencies are in the same place. i.e. are the same.
-						return false; // stop script. No need to split
-					} else {
-						var is_group = new RegExp(("^"+settings.grouping)+'.*'+(settings.grouping+'$'));
-						if (text.match(is_group) && text.match(new RegExp(settings.grouping, "g")).length == 2) {
-							// If it's a closed group (just 2 grouping chars, different places)
-							return;
-						}else{
-						// Split the groups
-						text = split_groups(text);
-						}
-					}
-					
-				};
-				// If text has separators
-				if (text.constructor === String) {
-					// If text is an Array, it's already splitted into tags
-					text = text.split(settings.separator);
-				}
-				return text;
 			};
 			
 			function split_groups (text) {
@@ -182,16 +173,6 @@
 				return text;
 			};
 			
-			function new_tag(text) {
-				var text = text || "",
-					$tag = $(settings.tag).clone(true); // Clone with events
-				// $.data($tag.get(0),'settings',settings);
-				$tag.find('input')
-					.siblings('span').html(sanitize(text))
-					.end().val(text).attr('name', settings.name);
-				return $tag.keyup();
-			};
-			
 			function search_in_dictionary (word, dictionary) {
 				// Accepts a string or regexp term
 				if (typeof word == "string") {
@@ -199,7 +180,7 @@
 				}
 				
 				if ($.isFunction(dictionary)) {
-					dictionary = split_tags(dictionary.call()).sort();
+					dictionary = split_tags(dictionary.call(), settings).sort();
 				}
 				var results = [];
 				$.each(dictionary, function(i, tag) {
@@ -276,7 +257,7 @@
 			if (settings.close) {
 				// If a custom close event is passed, call it
 				var close_event = settings.close.call(target, e, settings);
-				if (close_event === false) {
+				if (typeof close_event === 'boolean') {
 					// if the event returns boolean, return the result. Allows user to cancel the default close action by returning false
 					return close_event;
 				}
@@ -286,13 +267,12 @@
 			// If is the 'close' button, hide the tag and remove
 			if (settings.fx) {
 				// animate if settings.fx
-				$(this).animate({
-						width: 'hide'
-				},
-				'fast',
-				function() {
+				$(this).animate(
+					{width: 'hide'},
+					'fast',
+					function() {
 						$(this).remove();
-				});
+					});
 			}else {
 				// or just remove, without animation
 				$(this).remove();
@@ -303,7 +283,7 @@
 		}
 		if (target.is(settings.tag_class)) {
 			// The space between the tags is actually the <span> element. If you clicked, you clicked between tags.
-			target.before(new_tag());
+			target.before(new_tag(undefined,settings));
 			target.prev(settings.tag_class).find(':input').focus();
 		}
 
@@ -315,7 +295,7 @@
 	};
 	
 	function internal_blur(e) {
-		try{console.info(e);}catch(e){}
+		var settings = get_settings(e.target);
 		if (!$.trim($(this).val())) {
 			// If empty, remove the tag
 			setTimeout(function() {
@@ -335,8 +315,9 @@
 		if(e.keyCode == 8 ) {
 			// If BACKSPACE
 			if (!$.trim($(this).val())) {
-				var tag = $(this).closest(settings.tag_class),
-				prev_tag = tag.prev(settings.tag_class);
+				var settings = get_settings(e.target), // only get settings here for performance
+					tag = $(this).closest(settings.tag_class),
+					prev_tag = tag.prev(settings.tag_class);
 				if(prev_tag.length){
 					prev_tag.find(':input').focus();
 					tag.remove();
@@ -352,7 +333,7 @@
 			// if TAB or ENTER
 			if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
 				// And it's not shift+tab, and do not have a next tag
-				var tag = $(this).closest(settings.tag_class).after(new_tag());
+				var tag = $(this).closest(settings.tag_class).after(new_tag(undefined,settings));
 				setTimeout(function() {
 						tag.next(settings.tag_class).find('input').focus();
 				},
@@ -364,8 +345,8 @@
 	
 	function internal_keyup(e) {
 		var target = $(this),
-		value = this.value;
-		
+			value = this.value,
+			settings = get_settings(e.target);
 		//autocomplete
 		if ( settings.autocomplete && String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) && value.length) {
 			if (settings.autocomplete.url) {
@@ -374,11 +355,11 @@
 			autocomplete(this);
 		};
 		
-		target.siblings('span').html(sanitize(this.value));
+		target.siblings('span').html(sanitize(value));
 		// Add "M" to correct the tag size. Weird, but works! Using M because it's probally the widest character.
 		if ((settings.separator).test(value)) {
 			// If text has separators
-			var tags = split_tags(value);
+			var tags = split_tags(value, settings);
 			if(!tags){ // This way we can cancel the event if no extra processing is needed. (e.g. unmatched grouping character)
 				return;
 			}
@@ -393,7 +374,7 @@
 			var next_tag = [];
 			for (var i = tags.length - 1; i > 0; i--) {
 					
-					next_tag.push($(tag).after(new_tag(tags[i])).next());
+					next_tag.push($(tag).after(new_tag(tags[i], settings)).next());
 					// Create new tags for each separator
 			};
 			// Focus the last shown (first created) tag
@@ -406,6 +387,52 @@
 			
 		}
 	};
+	
+	function split_tags (text, settings){
+		if (!text || text.constructor != String) {
+			return text;
+		};
+		if (settings.grouping && text.indexOf(settings.grouping) !== -1) {
+			//If settings.grouping and matches grouping character											
+			var groupings = [text.indexOf(settings.grouping), text.lastIndexOf(settings.grouping)]
+			// Store the locations of the grouping characters.
+			if (groupings[0] == groupings[1]){ // Has a grouping char, but not terminated. The first and last occurrencies are in the same place. i.e. are the same.
+				return false; // stop script. No need to split
+			} else {
+				var is_group = new RegExp(("^"+settings.grouping)+'.*'+(settings.grouping+'$'));
+				if (text.match(is_group) && text.match(new RegExp(settings.grouping, "g")).length == 2) {
+					// If it's a closed group (just 2 grouping chars, different places)
+					return;
+				}else{
+				// Split the groups
+				text = split_groups(text);
+				}
+			}
+			
+		};
+		// If text has separators
+		if (text.constructor === String) {
+			// If text is an Array, it's already splitted into tags
+			text = text.split(settings.separator);
+		}
+		return text;
+	};
+	
+	function new_tag(text, settings) {
+		var text = text || "",
+			$tag = $(settings.tag).clone(true); // Clone with events
+		// $.data($tag.get(0),'settings',settings);
+		$tag.find('input')
+			.siblings('span').html(sanitize(text))
+			.end().val(text).attr('name', settings.name);
+		return $tag.keyup();
+	};
+	
+	function sanitize(text){
+		return text.replace(/\s/g, '&nbsp;').replace("<", "&lt;") + "M"
+	};
+
+	
 
 	
 } (jQuery));
