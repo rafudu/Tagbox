@@ -65,7 +65,7 @@
 				$box
 					.click(function(e, text) {
 						// If you click the tagbox, a new tag is created
-						 $(this).append(new_tag(text, settings)).find(settings.tag_class+':last input').focus();																	 
+						 $(this).append(new_tag(text, settings)).find(settings.tag_class+':last input').focus();
 					})
 					.bind('add_tag', function(e, text) {
 						if(!find_tag.call(this, text).length){
@@ -96,7 +96,9 @@
 
 					$.each(tags, function(){
 						if($.trim(this)){
-							$box.append(new_tag(this, settings));
+							var the_tag = new_tag(this, settings);
+							$box.append(the_tag);
+							the_tag.find('input').keyup()
 						}
 					});
 					// If have suggestion links, check if any of the suggestions matches the current tags
@@ -425,7 +427,7 @@
 		$tag.find('input')
 			.siblings('span').html(sanitize(text))
 			.end().val(text).attr('name', settings.name);
-		return $tag.keyup();
+		return $tag;
 	};
 	
 	function sanitize(text){
