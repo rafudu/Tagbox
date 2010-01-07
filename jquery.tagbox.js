@@ -7,7 +7,12 @@
 			fx: true, // animation to remove the tag
 			container: "div", // the tag that wraps tagbox, must be block level or with display:block in CSS
 			autocomplete: null, // autocomplete dictionary
-			suggestion_links: null // links with suggestions
+			suggestion_links: null, // links with suggestions
+			autocomplete_action: 'selection',
+						// 'selection' = selection mode completes the tag inline and select the remaining parts
+						// 'list' = shows a list of results. user can use arrow keys to select
+						// function = your custom function is called, resuts array is passed as parameter
+			dictionary_map: null // function that translates your dictionary object to a string
 		}
 	};
 
@@ -79,7 +84,7 @@
 
 					})
 					.bind('toggle_tag', function(e, text) {
-						suggestion = find_suggestion(text);
+						suggestion = find_suggestion(text,settings);
 						if(find_tag.call(this, text).length){
 							suggestion.removeClass('active')
 							$(this).trigger('remove_tag', text)
@@ -152,65 +157,7 @@
 				return tag;
 			};
 			
-			function split_groups (text) {
-				// TODO : This function does not respect the tag order. It will show the groups first and then the other tags.
-				var last_separator = "";
-
-				if (text.charAt(text.length-1).match(settings.separator)) {
-					last_separator = text.charAt(text.length-1);
-				};
-				var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"g"),
-				tags;
-				
-				//Remove extra spaces, remove the matched groups and split by separator.
-				tags = text.replace(groups, "").replace(/(\s)\s/g,"$1").split(settings.separator);
-				groups = text.match(groups); // Return the groups
-				
-				text = $.map($.merge(groups, tags), function(tag) {
-					if(tag){
-						return $.trim(tag);
-					}
-				});
-				text.push(last_separator);
-				return text;
-			};
 			
-			function search_in_dictionary (word, dictionary) {
-				// Accepts a string or regexp term
-				if (typeof word == "string") {
-					var word = new RegExp("^"+word,'i');
-				}
-				
-				if ($.isFunction(dictionary)) {
-					dictionary = split_tags(dictionary.call(), settings).sort();
-				}
-				var results = [];
-				$.each(dictionary, function(i, tag) {
-					if (tag.match(word)) {
-						results.push(tag);
-					};
-				});
-				return results;
-			};
-			
-			function autocomplete (textfield) {
-				var current_index = textfield.selectionStart,
-				value = textfield.value.substr(0,current_index);
-				var regx = new RegExp("^"+value,'i');
-				
-				// Find the tag in the dictionary
-				var results = search_in_dictionary(value, settings.autocomplete);
-				if (results.length) {
-					//Default autocomplete
-					var result = results[0].replace(regx,"");
-					//if you're typing with the cursor in the middle of the string, do not autocomplete
-					if (value.substr(current_index+1,result.length+1) != result){
-						textfield.value = value.substr(0,current_index) + result+value.substr(current_index); 
-					}
-					textfield.setSelectionRange(current_index, current_index + result.length);
-				}
-			};
-
 		}
 	});
 	
@@ -243,6 +190,111 @@
 		return ret;
 	};
 	
+	function split_groups (text,settings) {
+		// TODO : This function does not respect the tag order. It will show the groups first and then the other tags.
+		var last_separator = "";
+
+		if (text.charAt(text.length-1).match(settings.separator)) {
+			last_separator = text.charAt(text.length-1);
+		};
+		var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"g"),
+		tags;
+		
+		//Remove extra spaces, remove the matched groups and split by separator.
+		tags = text.replace(groups, "").replace(/(\s)\s/g,"$1").split(settings.separator);
+		groups = text.match(groups); // Return the groups
+		
+		text = $.map($.merge(groups, tags), function(tag) {
+			if(tag){
+				return $.trim(tag);
+			}
+		});
+		text.push(last_separator);
+		return text;
+	};
+
+	function search_in_dictionary (word, dictionary,settings) {
+		// Accepts a string or regexp term
+		if (typeof word == "string") {
+			var word = new RegExp("^"+word,'i');
+		}
+		
+		if ($.isFunction(dictionary)) {
+			dictionary = split_tags(dictionary.call(), settings);//.sort();
+		}
+		var results = [];
+		$.each(dictionary, function(i, tag) {
+			if(settings.dictionary_map) {
+				item = settings.dictionary_map(tag);
+			} else {
+				item = tag;
+			}
+			if (item.match(word)) {
+				results.push(tag);
+			};
+		});
+		return results;
+	};
+
+	function autocomplete (textfield,settings) {
+		var current_index = textfield.selectionStart,
+		value = textfield.value.substr(0,current_index);
+		var regx = new RegExp("^"+value,'i');
+		// Find the tag in the dictionary
+		var results = search_in_dictionary(value, settings.autocomplete,settings);
+		// console.clear();
+		if(settings.autocomplete_action == 'selection') {
+			if (results.length) {
+				// console.dir(results);
+				//Default autocomplete
+				var result;
+				if(settings.dictionary_map) {
+					result = settings.dictionary_map(results[0]);
+				} else {
+					result = results[0];
+				}
+			
+				result = result.replace(regx,"");
+				//if you're typing with the cursor in the middle of the string, do not autocomplete
+				if (value.substr(current_index+1,result.length+1) != result){
+					textfield.value = value.substr(0,current_index) + result+value.substr(current_index); 
+				}
+				textfield.setSelectionRange(current_index, current_index + result.length);
+			}
+		} else if(settings.autocomplete_action == 'list') {
+			if (results.length) {
+				// console.dir(results);
+				var $field = $(textfield),
+					pos = $field.offset(),
+					$tag = $field.closest(settings.tag_class),
+					$suggestions = $('#tagbox_autocomplete_sugestions'),
+					insert = false, html="<ul>";
+				$.each(results, function(i,item) {
+					if(settings.dictionary_map) {
+						result = settings.dictionary_map(item);
+					} else {
+						result = item;
+					}
+					html += '<li>'+result+'</li>';
+				});
+				html +='</ul>';
+				if($suggestions.size()===0) {
+					$suggestions = $('<div id="tagbox_autocomplete_sugestions"></div>');
+					insert = true;
+				}
+				$suggestions.css({position:'absolute',top:(pos.top+$field.innerHeight())+'px', left:pos.left+'px',background:'silver'})
+				$suggestions.html(html);
+				if(insert) {
+					$suggestions.insertAfter($tag.get(0));
+				}
+			} else {
+				$('#tagbox_autocomplete_sugestions').remove();
+			}
+		} else if($.isFunction(settings.autocomplete_action)) {
+			settings.autocomplete_action.call(this,results);
+		}
+	};
+
 	function find_suggestion (text, settings) {
 		return $(settings.suggestion_links).filter(function() {
 			return $(this).text() == text
@@ -307,14 +359,18 @@
 		}else if(settings.suggestion_links) {
 			// If not empty, activate and deactivate the suggestions
 			if (this.initialValue != this.value ) { // Get the initial value and deactivate
-				find_suggestion(this.initialValue).removeClass('active');
+				find_suggestion(this.initialValue,settings).removeClass('active');
 			};
-			find_suggestion(this.value).addClass('active'); // Get the current value and activate
+			find_suggestion(this.value,settings).addClass('active'); // Get the current value and activate
 		}
 	};
 	
 	function internal_keydown(e) {
 		if(e.keyCode == 8 ) {
+			if (e.keyCode == 13) {
+				// If ENTER key, do not submit.
+				e.preventDefault();
+			}
 			// If BACKSPACE
 			if (!$.trim($(this).val())) {
 				var settings = get_settings(e.target), // only get settings here for performance
@@ -327,11 +383,8 @@
 				}
 			};
 		}
-		if (e.keyCode == 13) {
-			// If ENTER key, do not submit.
-			e.preventDefault();
-		}
 		if (e.keyCode == 9 || e.keyCode == 13) {
+			var settings = get_settings(e.target); // only get settings here for performance
 			// if TAB or ENTER
 			if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
 				// And it's not shift+tab, and do not have a next tag
@@ -354,7 +407,7 @@
 			if (settings.autocomplete.url) {
 				// TODO: someting
 			};
-			autocomplete(this);
+			autocomplete(this,settings);
 		};
 		
 		target.siblings('span').html(sanitize(value));
@@ -407,7 +460,7 @@
 					return;
 				}else{
 				// Split the groups
-				text = split_groups(text);
+				text = split_groups(text,settings);
 				}
 			}
 			
