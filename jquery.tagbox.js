@@ -237,16 +237,20 @@
 			dictionary = split_tags(dictionary.call(), settings);//.sort();
 		}
 		var results = [];
+		// var resultsString = "";
 		$.each(dictionary, function(i, tag) {
+			var item;
 			if(settings.dictionary_map) {
-				item = settings.dictionary_map(tag);
+				item = settings.dictionary_map.call(this,tag);
 			} else {
 				item = tag;
 			}
 			if (item.match(word)) {
 				results.push(tag);
+				// resultsString += item +', ';
 			};
 		});
+		// console.log(resultsString);
 		return results;
 	};
 
@@ -254,9 +258,16 @@
 		var current_index = textfield.selectionStart,
 		value = textfield.value.substr(0,current_index);
 		var regx = new RegExp("^"+value,'i');
+		if(!textfield.selectionStart && document.selection && document.selection.createRange) {
+			var sel = document.selection.createRange();
+			sel.moveStart('character', -textfield.value.length);
+			current_index = sel.text.length;
+		}
 		// Find the tag in the dictionary
 		var results = search_in_dictionary(value, settings.autocomplete,settings);
 		// console.clear();
+		// console.info('autocomplete', '"'+value+'"');
+		// console.dir(results);
 		if(settings.autocomplete_action == 'selection') {
 			if (results.length) {
 				// console.dir(results);
@@ -273,7 +284,16 @@
 				if (value.substr(current_index+1,result.length+1) != result){
 					textfield.value = value.substr(0,current_index) + result+value.substr(current_index); 
 				}
-				textfield.setSelectionRange(current_index, current_index + result.length);
+				var end_index = current_index + result.length;
+				if (textfield.setSelectionRange) {
+					textfield.setSelectionRange(current_index, end_index);
+				} else if(textfield.createTextRange){
+					var range = textfield.createTextRange();
+					range.collapse(true);
+					range.moveStart('character', current_index);
+					range.moveEnd('character', end_index);
+					range.select();
+				}
 			}
 		} else if(settings.autocomplete_action == 'list') {
 			if (results.length) {
@@ -296,7 +316,7 @@
 					$suggestions = $('<div id="tagbox_autocomplete_sugestions"></div>');
 					insert = true;
 				}
-				$suggestions.css({position:'absolute',top:(pos.top+$field.innerHeight())+'px', left:pos.left+'px',background:'silver'})
+				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px',background:'silver'})
 				$suggestions.html(html);
 				if(insert) {
 					$suggestions.insertAfter($tag.get(0));
@@ -412,12 +432,12 @@
 		}
 	};
 	
-	function internal_keyup(e) {
+	function internal_keyup(e,force_autocomplete) {
 		var target = $(this),
 			value = this.value,
 			settings = get_settings(e.target);
 		//autocomplete
-		if ( settings.autocomplete && String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) && value.length) {
+		if ( settings.autocomplete  && value.length && ( force_autocomplete || String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) ) ) {
 			if (settings.autocomplete.url) {
 				// TODO: someting
 			};

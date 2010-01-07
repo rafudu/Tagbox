@@ -24,7 +24,7 @@ span.tag small {
 	position: absolute;
 	right: 3px;
 	bottom:0;
-	z-index: 9999;
+	z-index: 199;
 	height: 100%;
 	line-height: 22px;
 	cursor: pointer;
