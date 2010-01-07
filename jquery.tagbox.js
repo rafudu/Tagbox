@@ -70,7 +70,7 @@
 				$box
 					.click(function(e, text) {
 						// If you click the tagbox, a new tag is created
-						 $(this).append(new_tag(text, settings)).find(settings.tag_class+':last input').focus();
+						 $(this).tagboxNewTagAppend(text, settings).find(settings.tag_class+':last input').focus();
 					})
 					.bind('add_tag', function(e, text) {
 						if(!find_tag.call(this, text).length){
@@ -101,9 +101,7 @@
 
 					$.each(tags, function(){
 						if($.trim(this)){
-							var the_tag = new_tag(this, settings);
-							$box.append(the_tag);
-							the_tag.find('input').keyup()
+							$box.tagboxNewTagAppend(this,settings);
 						}
 					});
 					// If have suggestion links, check if any of the suggestions matches the current tags
@@ -158,8 +156,24 @@
 			};
 			
 			
+		},
+		tagboxNewTagAppend: function(tag, settings){
+			return newTagAction.call(this,tag, settings, 'append');
+		},
+		tagboxNewTagBefore: function(tag, settings){
+			return newTagAction.call(this,tag, settings, 'before');
+		},
+		tagboxNewTagAfter: function(tag, settings){
+			return newTagAction.call(this,tag, settings, 'after');
 		}
 	});
+	
+	function newTagAction(tag, settings, action) {
+		var the_tag = new_tag(tag, settings);
+		this[action](the_tag);
+		the_tag.find('input').keyup();
+		return this;
+	};
 	
 	function setup_tag(settings) {
 		$(settings.tag)
@@ -337,7 +351,7 @@
 		}
 		if (target.is(settings.tag_class)) {
 			// The space between the tags is actually the <span> element. If you clicked, you clicked between tags.
-			target.before(new_tag(undefined,settings));
+			target.tagboxNewTagBefore(undefined,settings);
 			target.prev(settings.tag_class).find(':input').focus();
 		}
 
@@ -388,7 +402,7 @@
 			// if TAB or ENTER
 			if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
 				// And it's not shift+tab, and do not have a next tag
-				var tag = $(this).closest(settings.tag_class).after(new_tag(undefined,settings));
+				var tag = $(this).closest(settings.tag_class).tagboxNewTagAfter(undefined,settings);
 				setTimeout(function() {
 						tag.next(settings.tag_class).find('input').focus();
 				},
@@ -429,7 +443,7 @@
 			var next_tag = [];
 			for (var i = tags.length - 1; i > 0; i--) {
 					
-					next_tag.push($(tag).after(new_tag(tags[i], settings)).next());
+					next_tag.push($(tag).tagboxNewTagAfter(tags[i], settings).next());
 					// Create new tags for each separator
 			};
 			// Focus the last shown (first created) tag
