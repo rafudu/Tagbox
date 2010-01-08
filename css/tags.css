@@ -54,3 +54,20 @@ span.tag label span {
 	margin-left: 5px;
 
 }
+#tagbox_autocomplete_sugestions {
+	-webkit-border-radius: 0 5px 5px 5px;
+	-moz-border-radius: 0 5px 5px 5px;
+	border-radius:  0 5px 5px 5px;
+	background:#fff;
+	border:1px solid #656696;
+	padding:5px 17px;
+	opacity: 0.9;
+	-moz-opacity: 0.9;
+	filter:alpha(opacity=90);
+	font-family: "Lucida Grande","Verdana";
+	font-size:11px;
+}
+#tagbox_autocomplete_sugestions ul {
+	padding-left:0;
+	list-style:none;
+}
