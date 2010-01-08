@@ -6,13 +6,13 @@
 			className : "tag", // without preciding .
 			fx: true, // animation to remove the tag
 			container: "div", // the tag that wraps tagbox, must be block level or with display:block in CSS
-			autocomplete: null, // autocomplete dictionary
 			suggestion_links: null, // links with suggestions
-			autocomplete_action: 'selection',
+			dictionary_map: null, // function that translates your autocomplete dictionary object to a string
+			autocomplete: null, // autocomplete dictionary
+			autocomplete_action: 'selection'
 						// 'selection' = selection mode completes the tag inline and select the remaining parts
 						// 'list' = shows a list of results. user can use arrow keys to select
 						// function = your custom function is called, resuts array is passed as parameter
-			dictionary_map: null // function that translates your dictionary object to a string
 		}
 	};
 
@@ -73,10 +73,10 @@
 						 $(this).tagboxNewTagAppend(text, settings).find(settings.tag_class+':last input').focus();
 					})
 					.bind('add_tag', function(e, text) {
-						if(!find_tag.call(this, text).length){
+						// if(!find_tag.call(this, text).length){
 							// if the tag doesn't exists
 							$(this).trigger('click', text);
-						}										
+						// }										
 					})
 					.bind('remove_tag', function(e, text) {
 						
@@ -86,11 +86,11 @@
 					.bind('toggle_tag', function(e, text) {
 						suggestion = find_suggestion(text,settings);
 						if(find_tag.call(this, text).length){
-							suggestion.removeClass('active')
-							$(this).trigger('remove_tag', text)
+							suggestion.removeClass('active');
+							$(this).trigger('remove_tag', text);
 						}else {
 							suggestion.addClass('active');
-							$(this).trigger('add_tag', text)
+							$(this).trigger('add_tag', text);
 						}
 					});
 
@@ -177,6 +177,7 @@
 	
 	function setup_tag(settings) {
 		$(settings.tag)
+			.click(settings.click)
 			.click(internal_click)
 			.find('input')
 			.focus(settings.focus)
@@ -316,7 +317,7 @@
 					$suggestions = $('<div id="tagbox_autocomplete_sugestions"></div>');
 					insert = true;
 				}
-				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px',background:'silver'})
+				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px'})
 				$suggestions.html(html);
 				if(insert) {
 					$suggestions.insertAfter($tag.get(0));
