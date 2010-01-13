@@ -80,9 +80,19 @@
 			$('.tagbox.suggestions').tagbox({
 			  suggestion_links: 'p.suggestions a'
 			});
-			$('.tagbox.autocomplete').tagbox({
+			$('.tagbox.autocompleteA').tagbox({
+				separator: /[ ]/,
 				autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
-				separator: /[ ]/
+				autocomplete_action:'selection'
+			});
+			$('.tagbox.autocompleteB').tagbox({
+				separator: /[ ]/,
+				autocomplete: ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 'cyan', 'darkblue', 'darkcyan', 'darkgoldenrod', 'darkgray', 'darkgreen', 'darkkhaki', 'darkmagenta', 'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon', 'darkseagreen', 'darkslateblue', 'darkslategray', 'darkturquoise', 'darkviolet', 'deeppink', 'deepskyblue', 'dimgray', 'dodgerblue', 'firebrick', 'floralwhite', 'forestgreen', 'fuchsia', 'gainsboro', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'greenyellow', 'honeydew', 'hotpink', 'indianred', 'indigo', 'ivory', 'khaki', 'lavender', 'lavenderblush', 'lawngreen', 'lemonchiffon', 'lightblue', 'lightcoral', 'lightcyan', 'lightgoldenrodyellow', 'lightgrey', 'lightgreen', 'lightpink', 'lightsalmon', 'lightseagreen', 'lightskyblue', 'lightslategray', 'lightsteelblue', 'lightyellow', 'lime', 'limegreen', 'linen', 'magenta', 'maroon', 'mediumaquamarine', 'mediumblue', 'mediumorchid', 'mediumpurple', 'mediumseagreen', 'mediumslateblue', 'mediumspringgreen', 'mediumturquoise', 'mediumvioletred', 'midnightblue', 'mintcream', 'mistyrose', 'moccasin', 'navajowhite', 'navy', 'oldlace', 'olive', 'olivedrab', 'orange', 'orangered', 'orchid', 'palegoldenrod', 'palegreen', 'paleturquoise', 'palevioletred', 'papayawhip', 'peachpuff', 'peru', 'pink', 'plum', 'powderblue', 'purple', 'red', 'rosybrown', 'royalblue', 'saddlebrown', 'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver', 'skyblue', 'slateblue', 'slategray', 'snow', 'springgreen', 'steelblue', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen'],
+				autocomplete_action:'list',
+				keyup:function(e) {
+					$(e.target).parents('label').css({background:this.value});
+					
+				}
 			});
 			$('.tagbox.separators').tagbox({
 				separator: /[,.; ]/
@@ -180,15 +190,29 @@
 		<div class="tagbox groupings clearfix ">
 			
 		</div>
-		<h2>Autocomplete</h2>
+		<h2>Autocomplete (selection)</h2>
 		<p>You can pass a word list as a dictionary to autocomplete. The list will be transformed in an array of tags based on your separator settings. <a href="#autocomplete" rel="see_code">(see code)</a></p>
 		<code id="autocomplete">
-	$('.tagbox.autocomplete').tagbox({
+	$('.tagbox.autocompleteA').tagbox({
+		separator: /[ ]/,
 		autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
-		separator: /[ ]/
+		autocomplete_action:'selection'
 	});
 			</code>
-		<div class="tagbox autocomplete clearfix ">
+		<div class="tagbox autocompleteA clearfix ">
+			
+		</div>
+		
+		<h2>Autocomplete (list)</h2>
+		<p>You can pass a word list as a dictionary to autocomplete. The list will be transformed in an array of tags based on your separator settings. <a href="#autocomplete" rel="see_code">(see code)</a></p>
+		<code id="autocomplete">
+	$('.tagbox.autocompleteB').tagbox({
+		separator: /[ ]/,
+		autocomplete: "Alfa Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Xray Yankee Zulu",
+		autocomplete_action:'list'
+	});
+			</code>
+		<div class="tagbox autocompleteB clearfix ">
 			
 		</div>
 		

@@ -41,9 +41,11 @@
 				if(settings.autocomplete_action == 'list') {
 					$('#tagbox_autocomplete_sugestions .item').live('click',function(e){
 						e.preventDefault();e.stopPropagation();
-						var $choosen = $(this),
-							textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
-						list_complete(textfield,$choosen,settings);
+						if($('#tagbox_autocomplete_sugestions').size()) {
+							var $choosen = $(this),
+								textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
+							list_complete(textfield,$choosen,settings);
+						}
 						return false;
 					});
 				}
@@ -80,7 +82,9 @@
 				$box
 					.click(function(e, text) {
 						// If you click the tagbox, a new tag is created
-						 $(this).tagboxNewTagAppend(text, settings).find(settings.tag_class+':last input').focus();
+						if(e.target == this) {
+							$(this).tagboxNewTagAppend(text, settings).find(settings.tag_class+':last input').focus();
+						}
 					})
 					.bind('add_tag', function(e, text) {
 						// if(!find_tag.call(this, text).length){
@@ -185,6 +189,7 @@
 		var the_tag = new_tag(tag, settings);
 		this[action](the_tag);
 		the_tag.find('input').keyup();
+		$('#tagbox_autocomplete_sugestions').remove();
 		return this;
 	};
 	
@@ -270,7 +275,6 @@
 
 	function autocomplete (textfield,settings) {
 		var value = ''+textfield.value;
-		var regx = new RegExp("^"+value,'i');
 		// Find the tag in the dictionary
 		var results = search_in_dictionary(value, settings.autocomplete,settings);
 		// console.clear();
@@ -278,13 +282,14 @@
 		// console.dir(results);
 		if(settings.autocomplete_action == 'selection') {
 			if (results.length) {
-				value = value.substr(0,current_index);
-				var current_index = textfield.selectionStart
+				var regx = new RegExp("^"+value,'i'),
+					current_index = textfield.selectionStart;
 				if(!textfield.selectionStart && document.selection && document.selection.createRange) {
 					var sel = document.selection.createRange();
 					sel.moveStart('character', -textfield.value.length);
 					current_index = sel.text.length;
 				}
+				value = value.substr(0,current_index);
 				// console.dir(results);
 				//Default autocomplete
 				var result;
@@ -293,11 +298,10 @@
 				} else {
 					result = results[0];
 				}
-			
 				result = result.replace(regx,"");
 				//if you're typing with the cursor in the middle of the string, do not autocomplete
 				if (value.substr(current_index+1,result.length+1) != result){
-					textfield.value = value.substr(0,current_index) + result+value.substr(current_index); 
+					textfield.value = value.substr(0,current_index) + result + value.substr(current_index); 
 				}
 				var end_index = current_index + result.length;
 				if (textfield.setSelectionRange) {
@@ -353,7 +357,7 @@
 					$(this).removeClass('current')
 				});
 			} else {
-				$('#tagbox_autocomplete_sugestions').remove();
+				// $('#tagbox_autocomplete_sugestions').remove();
 			}
 		} else if($.isFunction(settings.autocomplete_action)) {
 			settings.autocomplete_action.call(this,results);
@@ -421,7 +425,7 @@
 				setTimeout(function(){
 					$that = $('#tagbox_autocomplete_sugestions');
 					if($that.size() && $.data($that.get(0),'textfield') == textfield) {
-						$that.remove();
+						// $that.remove();
 					}
 				},200);
 			})();
@@ -503,8 +507,8 @@
 			result = item;
 		}
 		$(elem).val(result).parents(settings.tag_class).trigger('choose_tag',[elem,item]);
-		$('#tagbox_autocomplete_sugestions').remove();
 		$(elem).keyup();
+		$('#tagbox_autocomplete_sugestions').remove();
 	};
 	
 	function internal_keyup(e,force_autocomplete) {
