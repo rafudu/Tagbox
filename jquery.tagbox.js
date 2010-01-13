@@ -9,10 +9,11 @@
 			suggestion_links: null, // links with suggestions
 			dictionary_map: null, // function that translates your autocomplete dictionary object to a string
 			autocomplete: null, // autocomplete dictionary
-			autocomplete_action: 'selection'
+			autocomplete_action: 'selection',
 						// 'selection' = selection mode completes the tag inline and select the remaining parts
 						// 'list' = shows a list of results. user can use arrow keys to select
 						// function = your custom function is called, resuts array is passed as parameter
+			autocomplete_list_html: null // experimental, it's highlly recomended that you copy and extend our internal html
 		}
 	};
 
@@ -37,11 +38,20 @@
 						// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
 					}
 				}
+				if(settings.autocomplete_action == 'list') {
+					$('#tagbox_autocomplete_sugestions .item').live('click',function(e){
+						e.preventDefault();e.stopPropagation();
+						var $choosen = $(this),
+							textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
+						list_complete(textfield,$choosen,settings);
+						return false;
+					});
+				}
 
 				settings.tag_class = '.'+settings.className;
 				var content = this;
 				//Setting up the 'default' tag, witch is, an original DOM element that is never inserted, only cloned
-				settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
+				settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" autocomplete="off" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
 				setup_tag(settings);
 
 				// transform inputs into some block level element
@@ -169,6 +179,9 @@
 	});
 	
 	function newTagAction(tag, settings, action) {
+		if(!settings) {
+			settings = get_settings(this.eq(0));
+		}
 		var the_tag = new_tag(tag, settings);
 		this[action](the_tag);
 		the_tag.find('input').keyup();
@@ -256,14 +269,8 @@
 	};
 
 	function autocomplete (textfield,settings) {
-		var current_index = textfield.selectionStart,
-		value = textfield.value.substr(0,current_index);
+		var value = ''+textfield.value;
 		var regx = new RegExp("^"+value,'i');
-		if(!textfield.selectionStart && document.selection && document.selection.createRange) {
-			var sel = document.selection.createRange();
-			sel.moveStart('character', -textfield.value.length);
-			current_index = sel.text.length;
-		}
 		// Find the tag in the dictionary
 		var results = search_in_dictionary(value, settings.autocomplete,settings);
 		// console.clear();
@@ -271,6 +278,13 @@
 		// console.dir(results);
 		if(settings.autocomplete_action == 'selection') {
 			if (results.length) {
+				value = value.substr(0,current_index);
+				var current_index = textfield.selectionStart
+				if(!textfield.selectionStart && document.selection && document.selection.createRange) {
+					var sel = document.selection.createRange();
+					sel.moveStart('character', -textfield.value.length);
+					current_index = sel.text.length;
+				}
 				// console.dir(results);
 				//Default autocomplete
 				var result;
@@ -298,30 +312,46 @@
 			}
 		} else if(settings.autocomplete_action == 'list') {
 			if (results.length) {
+				// console.clear();
+				// console.info('autocomplete:'+value);
+				// console.dir(results);
 				// console.dir(results);
 				var $field = $(textfield),
 					pos = $field.offset(),
 					$tag = $field.closest(settings.tag_class),
 					$suggestions = $('#tagbox_autocomplete_sugestions'),
-					insert = false, html="<ul>";
-				$.each(results, function(i,item) {
-					if(settings.dictionary_map) {
-						result = settings.dictionary_map(item);
-					} else {
-						result = item;
-					}
-					html += '<li>'+result+'</li>';
-				});
-				html +='</ul>';
+					insert = false,html;
+				if(settings.autocomplete_list_html) {
+					html = settings.autocomplete_list_html.call(this,results);
+				} else {
+					var $listElems=$('<ul></ul>');
+					$.each(results, function(i,item) {
+						if(settings.dictionary_map) {
+							result = settings.dictionary_map(item);
+						} else {
+							result = item;
+						}
+						var listItem = $('<li class="item">'+result+'</li>').get(0);
+						$.data(listItem,'item',item);
+						$listElems.append(listItem);
+					});
+					html = $listElems;
+				}
 				if($suggestions.size()===0) {
 					$suggestions = $('<div id="tagbox_autocomplete_sugestions"></div>');
 					insert = true;
 				}
 				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px'})
-				$suggestions.html(html);
+				$suggestions.empty().append(html);
 				if(insert) {
 					$suggestions.insertAfter($tag.get(0));
 				}
+				$.data($suggestions.get(0),'textfield',textfield);
+				$('#tagbox_autocomplete_sugestions .item').hover(function() {
+					$(this).addClass('current').siblings('.item').removeClass('current');
+				}, function() {
+					$(this).removeClass('current')
+				});
 			} else {
 				$('#tagbox_autocomplete_sugestions').remove();
 			}
@@ -385,6 +415,17 @@
 	
 	function internal_blur(e) {
 		var settings = get_settings(e.target);
+		if(settings.autocomplete_action == 'list') {
+			(function(){
+				var textfield = e.target;
+				setTimeout(function(){
+					$that = $('#tagbox_autocomplete_sugestions');
+					if($that.size() && $.data($that.get(0),'textfield') == textfield) {
+						$that.remove();
+					}
+				},200);
+			})();
+		}
 		if (!$.trim($(this).val())) {
 			// If empty, remove the tag
 			setTimeout(function() {
@@ -401,17 +442,17 @@
 	};
 	
 	function internal_keydown(e) {
+		if (e.keyCode == 13) {
+			// If ENTER key, do not submit.
+			e.preventDefault();
+		}
 		if(e.keyCode == 8 ) {
-			if (e.keyCode == 13) {
-				// If ENTER key, do not submit.
-				e.preventDefault();
-			}
 			// If BACKSPACE
 			if (!$.trim($(this).val())) {
 				var settings = get_settings(e.target), // only get settings here for performance
 					tag = $(this).closest(settings.tag_class),
 					prev_tag = tag.prev(settings.tag_class);
-				if(prev_tag.length){
+				if(prev_tag.size()){
 					prev_tag.find(':input').focus();
 					tag.remove();
 					e.preventDefault();
@@ -419,21 +460,57 @@
 			};
 		}
 		if (e.keyCode == 9 || e.keyCode == 13) {
-			var settings = get_settings(e.target); // only get settings here for performance
 			// if TAB or ENTER
-			if (!e.shiftKey && $.trim($(this).val()) && !$(this).closest(settings.tag_class).next(settings.tag_class).length) {
+			var settings = get_settings(e.target); // only get settings here for performance
+			// console.info('TAB or ENTER')
+			// if autocomplete list
+			var $choosen = $('#tagbox_autocomplete_sugestions .current');
+			// console.info($choosen);
+			if(settings.autocomplete_action == 'list' && $choosen.size() !== 0) {
+				list_complete(this,$choosen,settings);
+			}
+			
+			// if this is the last tag on the box, create a new empty tag
+			if (!e.shiftKey && $.trim($(this).val()) && !$(this).parents(settings.tag_class).nextAll(settings.tag_class).size()) {
 				// And it's not shift+tab, and do not have a next tag
 				var tag = $(this).closest(settings.tag_class).tagboxNewTagAfter(undefined,settings);
 				setTimeout(function() {
-						tag.next(settings.tag_class).find('input').focus();
+					tag.next(settings.tag_class).find('input').focus();
 				},
 				50);
 				return true;
 			}
 		}
+		if (e.keyCode == 38 || e.keyCode == 40) {
+			// if UP or DOWN
+			var way = e.keyCode === 38 ? 'prev':'next',
+				$curr = $('#tagbox_autocomplete_sugestions .current');
+			if($curr.size()==0) {
+				$('#tagbox_autocomplete_sugestions .item:'+(e.keyCode === 38 ? 'last':'first')).addClass('current');
+			} else {
+				$curr.removeClass('current')[way]('.item').addClass('current');
+			}
+		}
+	};
+	
+	function list_complete(elem,$choosen,settings) {
+		var result = '',
+			item = $.data($choosen.get(0),'item');
+		// console.info('item',item);
+		if(settings.dictionary_map) {
+			result = settings.dictionary_map(item);
+		} else {
+			result = item;
+		}
+		$(elem).val(result).parents(settings.tag_class).trigger('choose_tag',[elem,item]);
+		$('#tagbox_autocomplete_sugestions').remove();
+		$(elem).keyup();
 	};
 	
 	function internal_keyup(e,force_autocomplete) {
+		// if(e.keyCode) {
+		// 	console.info('keyCode',e.keyCode);
+		// }
 		var target = $(this),
 			value = this.value,
 			settings = get_settings(e.target);

@@ -60,7 +60,7 @@ span.tag label span {
 	border-radius:  0 5px 5px 5px;
 	background:#fff;
 	border:1px solid #656696;
-	padding:5px 17px;
+	padding:5px 12px;
 	opacity: 0.9;
 	-moz-opacity: 0.9;
 	filter:alpha(opacity=90);
@@ -70,4 +70,12 @@ span.tag label span {
 #tagbox_autocomplete_sugestions ul {
 	padding-left:0;
 	list-style:none;
+}
+#tagbox_autocomplete_sugestions .item {
+	color:#656696;
+	padding:1px 5px;
+}
+#tagbox_autocomplete_sugestions .current {
+	background:#656696;
+	color:#fff;
 }
