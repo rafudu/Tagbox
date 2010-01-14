@@ -161,14 +161,8 @@
 			function find_tag (text) {
 				return $(this).find(settings.tag_class+' input').filter(function() {
 						return $(this).val() == text
-				}).closest(settings.tag_class);
+				}).parents(settings.tag_class);
 			};
-			
-			function set_label(tag, text){
-				tag.find('input').val(text).siblings('span').html(sanitize(text));
-				return tag;
-			};
-			
 			
 		},
 		tagboxNewTagAppend: function(tag, settings){
@@ -246,10 +240,14 @@
 		return text;
 	};
 
+	function search_regx(word,settings) {
+		return new RegExp("^"+(settings.grouping?settings.grouping+'?':'')+word,'i');
+	};
+
 	function search_in_dictionary (word, dictionary,settings) {
 		// Accepts a string or regexp term
 		if (typeof word == "string") {
-			var word = new RegExp("^"+settings.grouping+'?'+word,'i');
+			var word = search_regx(word,settings);
 		}
 		
 		if ($.isFunction(dictionary)) {
@@ -279,10 +277,10 @@
 		var results = search_in_dictionary(value, settings.autocomplete,settings);
 		// console.clear();
 		// console.info('autocomplete', '"'+value+'"');
-		// console.dir(results);
+		// console.debug('results',results);
 		if(settings.autocomplete_action == 'selection') {
 			if (results.length) {
-				var regx = new RegExp("^"+value,'i'),
+				var regx = search_regx(value,settings),
 					current_index = textfield.selectionStart;
 				if(!textfield.selectionStart && document.selection && document.selection.createRange) {
 					var sel = document.selection.createRange();
@@ -423,14 +421,20 @@
 	
 	function internal_blur(e) {
 		var settings = get_settings(e.target);
+		
 		if(settings.autocomplete_action == 'list') {
-			(function(){
-				var textfield = e.target;
+			// delete active suggestions, but not now, since other actions need the div to still exist
+			(function(){ // closure to remember witch input is closing the suggestions
+				var textfield = e.target; 
 				setTimeout(function(){
-					$that = $('#tagbox_autocomplete_sugestions');
-					if($that.size() && $.data($that.get(0),'textfield') == textfield) {
-						// $that.remove();
+					var $that = $('#tagbox_autocomplete_sugestions');
+					if($that.size()) { // sugestion could be already gone closed buy keyup or focus or anything else
+						var datafield = $.data($that.get(0),'textfield'); // get the current textfield using the suggestions
+						if(datafield == textfield) { // make sure the suggestion is not showing other inputs suggestions before closing it
+							$that.remove();
+						}
 					}
+					textfield = null; // garbage collect for IE6
 				},200);
 			})();
 		}
@@ -524,9 +528,9 @@
 			settings = get_settings(e.target);
 		//autocomplete
 		if ( settings.autocomplete  && value.length && ( force_autocomplete || String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) || e.keyCode == 8) ) {
-			if (settings.autocomplete.url) {
-				// TODO: someting
-			};
+			// if (settings.autocomplete.url) {
+			// 	// TODO: someting
+			// };
 			autocomplete(this,settings);
 		};
 		
@@ -535,7 +539,7 @@
 		if ((settings.separator).test(value)) {
 			// If text has separators
 			var tags = split_tags(value, settings);
-			if(!tags){ // This way we can cancel the event if no extra processing is needed. (e.g. unmatched grouping character)
+			if(!tags || !tags.length){ // This way we can cancel the event if no extra processing is needed. (e.g. unmatched grouping character)
 				return;
 			}
 			if(tags.length===1) {
@@ -544,7 +548,8 @@
 			}
 			tag = target.closest(settings.tag_class);
 			
-			target.val(tags[0]).siblings('span').html(sanitize(tags[0]));
+			target.val(tags[0]);
+			target.siblings('span').html(sanitize(tags[0]));
 			
 			var next_tag = [];
 			for (var i = tags.length - 1; i > 0; i--) {
@@ -561,6 +566,9 @@
 
 			
 		}
+		
+		// TODO: close tag and create a new one on closed separators someting like if( /^"[^"]+"$/.test(value) && (settings.grouping).test(String.fromCharCode(e.keyCode)) )
+		
 	};
 	
 	function split_tags (text, settings){
@@ -607,6 +615,10 @@
 		return text.replace(/\s/g, '&nbsp;').replace("<", "&lt;") + "M"
 	};
 
+	function set_label(tag, text){
+		tag.find('input').val(text).siblings('span').html(sanitize(text));
+		return tag;
+	};
 	
 
 	
