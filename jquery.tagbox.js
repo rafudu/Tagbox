@@ -249,7 +249,7 @@
 	function search_in_dictionary (word, dictionary,settings) {
 		// Accepts a string or regexp term
 		if (typeof word == "string") {
-			var word = new RegExp("^"+word,'i');
+			var word = new RegExp("^"+settings.grouping+'?'+word,'i');
 		}
 		
 		if ($.isFunction(dictionary)) {
@@ -326,7 +326,11 @@
 					$suggestions = $('#tagbox_autocomplete_sugestions'),
 					insert = false,html;
 				if(settings.autocomplete_list_html) {
-					html = settings.autocomplete_list_html.call(this,results);
+					html = settings.autocomplete_list_html.call(this,results,textfield);
+					if(html === false) {
+						$('#tagbox_autocomplete_sugestions').remove();
+						return;
+					}
 				} else {
 					var $listElems=$('<ul></ul>');
 					$.each(results, function(i,item) {
@@ -357,7 +361,7 @@
 					$(this).removeClass('current')
 				});
 			} else {
-				// $('#tagbox_autocomplete_sugestions').remove();
+				$('#tagbox_autocomplete_sugestions').remove();
 			}
 		} else if($.isFunction(settings.autocomplete_action)) {
 			settings.autocomplete_action.call(this,results);
@@ -519,7 +523,7 @@
 			value = this.value,
 			settings = get_settings(e.target);
 		//autocomplete
-		if ( settings.autocomplete  && value.length && ( force_autocomplete || String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) ) ) {
+		if ( settings.autocomplete  && value.length && ( force_autocomplete || String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) || e.keyCode == 8) ) {
 			if (settings.autocomplete.url) {
 				// TODO: someting
 			};
