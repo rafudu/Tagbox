@@ -38,17 +38,6 @@
 						// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
 					}
 				}
-				if(settings.autocomplete_action == 'list') {
-					$('#tagbox_autocomplete_sugestions .item').live('click',function(e){
-						e.preventDefault();e.stopPropagation();
-						if($('#tagbox_autocomplete_sugestions').size()) {
-							var $choosen = $(this),
-								textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
-							list_complete(textfield,$choosen,settings);
-						}
-						return false;
-					});
-				}
 
 				settings.tag_class = '.'+settings.className;
 				var content = this;
@@ -66,7 +55,14 @@
 					// import string
 					$box = $box.parent().text($box.val());
 					// preserve chainability
-					$chain.push($box.get(0));
+					if($chain.push) {
+						// jQuery 1.3+
+						$chain.push($box.get(0));
+					} else {
+						// jQuery 1.2.6 compatibility
+						$chain[$chain.size()] = $box.get(0);
+						$chain.length++;
+					}
 					remove_from_chain.push($old.get(0)); // queue for later removal, since we are inside the jQuery.each protected loop
 					// remove from the DOM
 					$old.remove();
@@ -84,6 +80,14 @@
 						// If you click the tagbox, a new tag is created
 						if(e.target == this) {
 							$(this).tagboxNewTagAppend(text, settings).find(settings.tag_class+':last input').focus();
+						} else if ($(e.target).is('#tagbox_autocomplete_sugestions .item')) {
+							e.preventDefault();e.stopPropagation();
+							if($('#tagbox_autocomplete_sugestions').size()) {
+								var $choosen = $(e.target),
+									textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
+								list_complete(textfield,$choosen,settings);
+							}
+							return false;
 						}
 					})
 					.bind('add_tag', function(e, text) {
@@ -135,10 +139,18 @@
 				
 				if (settings.suggestion_links) {
 					//Bind a live event for the suggestions
-					$(settings.suggestion_links).live('click', function(e) {
+					var sug_handler = function(e) {
 						e.preventDefault();
 						$box.trigger('toggle_tag', $(this).text());
-					});
+					};
+					if($.live) {
+						$(settings.suggestion_links).live('click', sug_handler);
+					} else {
+						// jQuery 1.2.6 compatibility
+						$(function(){
+							$(settings.suggestion_links).click(sug_handler);
+						});
+					}
 				};
 				
 			});
@@ -320,7 +332,7 @@
 				// console.dir(results);
 				var $field = $(textfield),
 					pos = $field.offset(),
-					$tag = $field.closest(settings.tag_class),
+					$tag = $field.parents(settings.tag_class),
 					$suggestions = $('#tagbox_autocomplete_sugestions'),
 					insert = false,html;
 				if(settings.autocomplete_list_html) {
@@ -388,7 +400,7 @@
 				}
 			}
 			//deactivate the suggestion for this tag, if exists
-			find_suggestion($(this).closest(settings.tag_class).find('input').val(), settings).removeClass('active')
+			find_suggestion($(this).parents(settings.tag_class).find('input').val(), settings).removeClass('active')
 			// If is the 'close' button, hide the tag and remove
 			if (settings.fx) {
 				// animate if settings.fx
@@ -441,7 +453,7 @@
 		if (!$.trim($(this).val())) {
 			// If empty, remove the tag
 			setTimeout(function() {
-					$(e.target).closest(settings.tag_class).remove();
+					$(e.target).parents(settings.tag_class).remove();
 			},100);
 			// This timeout is necessary for safari.
 		}else if(settings.suggestion_links) {
@@ -462,7 +474,7 @@
 			// If BACKSPACE
 			if (!$.trim($(this).val())) {
 				var settings = get_settings(e.target), // only get settings here for performance
-					tag = $(this).closest(settings.tag_class),
+					tag = $(this).parents(settings.tag_class),
 					prev_tag = tag.prev(settings.tag_class);
 				if(prev_tag.size()){
 					prev_tag.find(':input').focus();
@@ -485,7 +497,7 @@
 			// if this is the last tag on the box, create a new empty tag
 			if (!e.shiftKey && $.trim($(this).val()) && !$(this).parents(settings.tag_class).nextAll(settings.tag_class).size()) {
 				// And it's not shift+tab, and do not have a next tag
-				var tag = $(this).closest(settings.tag_class).tagboxNewTagAfter(undefined,settings);
+				var tag = $(this).parents(settings.tag_class).tagboxNewTagAfter(undefined,settings);
 				setTimeout(function() {
 					tag.next(settings.tag_class).find('input').focus();
 				},
@@ -507,14 +519,15 @@
 	
 	function list_complete(elem,$choosen,settings) {
 		var result = '',
-			item = $.data($choosen.get(0),'item');
+			item = $.data($choosen.get(0),'item'),
+			$elm = $(elem);
 		// console.info('item',item);
 		if(settings.dictionary_map) {
 			result = settings.dictionary_map(item);
 		} else {
 			result = item;
 		}
-		$(elem).val(result).parents(settings.tag_class).trigger('choose_tag',[elem,item]);
+		$(elem).val(result).parents(settings.container).trigger('choose_tag',[elem,item]);
 		$(elem).keyup();
 		$('#tagbox_autocomplete_sugestions').remove();
 	};
@@ -546,7 +559,7 @@
 				// IE creates a 1 sized array, others create an 2 sized array with second item as empty sting
 				tags.push('');
 			}
-			tag = target.closest(settings.tag_class);
+			tag = target.parents(settings.tag_class);
 			
 			target.val(tags[0]);
 			target.siblings('span').html(sanitize(tags[0]));
