@@ -234,27 +234,22 @@
 		return ret;
 	};
 	
+	// receive an input string and return an array respecting groupings and preserving order
 	function split_groups (text,settings) {
-		// TODO : This function does not respect the tag order. It will show the groups first and then the other tags.
-		var last_separator = "";
+		var gr = settings.grouping, grTags=[],
+			regexGroup = new RegExp(gr+'[^'+gr+']+'+gr); // regex to find grouping pairs
 
-		if (text.charAt(text.length-1).match(settings.separator)) {
-			last_separator = text.charAt(text.length-1);
-		};
-		var groups = new RegExp(settings.grouping+'.*?'+settings.grouping,"g"),
-		tags;
-		
-		//Remove extra spaces, remove the matched groups and split by separator.
-		tags = text.replace(groups, "").replace(/(\s)\s/g,"$1").split(settings.separator);
-		groups = text.match(groups); // Return the groups
-		
-		text = $.map($.merge(groups, tags), function(tag) {
-			if(tag){
-				return $.trim(tag);
-			}
+		var result = text.replace(regexGroup,function(tag){
+			grTags.push(tag); // remember found grouped tags
+			return '_GROUP_HERE_'; // and leave a placeholder in it's place
 		});
-		text.push(last_separator);
-		return text;
+		// split remaining tags and iterate the array
+		// replacing placeholders by previously found groupings
+		result = $.map(result.split(settings.separator),function(tag){
+			return tag == '_GROUP_HERE_' ? grTags.shift() : tag;
+		});
+
+		return result;
 	};
 
 	function search_regx(word,settings) {
