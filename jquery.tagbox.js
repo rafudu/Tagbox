@@ -237,7 +237,7 @@
 	// receive an input string and return an array respecting groupings and preserving order
 	function split_groups (text,settings) {
 		var gr = settings.grouping, grTags=[],
-			regexGroup = new RegExp(gr+'[^'+gr+']+'+gr); // regex to find grouping pairs
+			regexGroup = new RegExp(gr+'[^'+gr+']+'+gr,'g'); // regex to find grouping pairs
 
 		var result = text.replace(regexGroup,function(tag){
 			grTags.push(tag); // remember found grouped tags
