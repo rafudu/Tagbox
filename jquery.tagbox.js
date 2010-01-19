@@ -20,27 +20,19 @@
 	$.fn.extend({
 		tagbox: function(settings) {
 			// object to preserve chainability
-			var $chain = this;
-			var remove_from_chain=[];
+			var $chain = this,
+				remove_from_chain=[];
 			
 			this.each(function init_box() {
 				var $box = $(this);
 
 				settings = jQuery.extend({},$.tagbox.defaults, settings);
-				if (settings.autocomplete){
-					if (settings.autocomplete.constructor == String || settings.autocomplete.constructor == Array) {
-						// If autocomplete is a string or an array, parse it as a dictionary and sort.
-						settings.autocomplete = split_tags(settings.autocomplete, settings).sort();
-					}
-					else if(settings.autocomplete.constructor == Function){
-						// a function that returns a dictionary when it's called. 
-					}else {
-						// MUST be an object, with a 'url' property that returns a dictionary, and a callback to receive the results
-					}
+				if (settings.autocomplete && settings.autocomplete.constructor == String) {
+					// If autocomplete is a string, parse it as a dictionary and sort.
+					settings.autocomplete = split_tags(settings.autocomplete, settings).sort();
 				}
 
 				settings.tag_class = '.'+settings.className;
-				var content = this;
 				//Setting up the 'default' tag, witch is, an original DOM element that is never inserted, only cloned
 				settings.tag = $('<span class="'+settings.className+'"><label><span></span><input type="text" autocomplete="off" name="'+settings.name+'" value=" " /><small class="close" title="close">x</small></label></span>').get(0);
 				setup_tag(settings);
@@ -72,6 +64,7 @@
 				if ($.data($box.get(0),'settings')) {
 					return;
 				}
+				settings.box = $box.get(0);
 				// store settings so functions outside the init code can find it
 				$.data($box.get(0),'settings',settings);
 
@@ -96,16 +89,11 @@
 							$(this).trigger('click', text);
 						// }										
 					})
-					.bind('remove_tag', function(e, text) {
-						
-						find_tag.call(this, text).remove();
-
-					})
 					.bind('toggle_tag', function(e, text) {
 						suggestion = find_suggestion(text,settings);
 						if(find_tag.call(this, text).length){
 							suggestion.removeClass('active');
-							$(this).trigger('remove_tag', text);
+							remove_tag(find_tag.call(this, text), settings);
 						}else {
 							suggestion.addClass('active');
 							$(this).trigger('add_tag', text);
@@ -199,19 +187,36 @@
 		return this;
 	};
 	
+	function remove_tag(tag, settings) {
+		if($(settings.box).trigger('remove_tag',tag) !== false) {
+			if (settings.fx) {
+				// animate if settings.fx
+				$(tag).animate(
+					{width: 'hide'},
+					'fast',
+					function() {
+						$(tag).remove();
+					});
+			}else {
+				// or just remove, without animation
+				$(tag).remove();
+			}
+		}
+	}
+	
 	function setup_tag(settings) {
 		$(settings.tag)
 			.click(settings.click)
 			.click(internal_click)
 			.find('input')
-			.focus(settings.focus)
-			.blur(settings.blur)
-			.keydown(settings.keydown)
-			.keyup(settings.keyup)
-			.focus(internal_focus)
-			.blur(internal_blur)
-			.keydown(internal_keydown)
-			.keyup(internal_keyup);
+				.focus(settings.focus)
+				.blur(settings.blur)
+				.keydown(settings.keydown)
+				.keyup(settings.keyup)
+				.focus(internal_focus)
+				.blur(internal_blur)
+				.keydown(internal_keydown)
+				.keyup(internal_keyup);
 	};
 
 	// search the dom for settings stored with $.data()
@@ -401,20 +406,8 @@
 			}
 			//deactivate the suggestion for this tag, if exists
 			find_suggestion($(this).parents(settings.tag_class).find('input').val(), settings).removeClass('active')
-			// If is the 'close' button, hide the tag and remove
-			if (settings.fx) {
-				// animate if settings.fx
-				$(this).animate(
-					{width: 'hide'},
-					'fast',
-					function() {
-						$(this).remove();
-					});
-			}else {
-				// or just remove, without animation
-				$(this).remove();
-			}
 			
+			remove_tag(this, settings);
 			
 			return false;
 		}
@@ -478,7 +471,7 @@
 					prev_tag = tag.prev(settings.tag_class);
 				if(prev_tag.size()){
 					prev_tag.find(':input').focus();
-					tag.remove();
+					remove_tag(tag, settings);
 					e.preventDefault();
 				}
 			};
@@ -574,7 +567,7 @@
 			next_tag.shift().find('input').focus();
 
 			if (!$.trim(tags[0])) { //If the first tag is empty, remove
-				tag.remove();
+				remove_tag(tag,settings);
 			}
 
 			
