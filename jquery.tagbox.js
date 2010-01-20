@@ -84,10 +84,7 @@
 						}
 					})
 					.bind('add_tag', function(e, text) {
-						// if(!find_tag.call(this, text).length){
-							// if the tag doesn't exists
-							$(this).trigger('click', text);
-						// }										
+						$(this).trigger('click', text);
 					})
 					.bind('toggle_tag', function(e, text) {
 						suggestion = find_suggestion(text,settings);
@@ -155,8 +152,7 @@
 				return keep;
 			});
 			
-			// internal functions
-			// TODO: memory menagement - move this functions outsite the .tagbox() function.
+			// TODO: memory menagement - move find_tag outside the closure and maybe exposes it to the outside world
 
 			function find_tag (text) {
 				return $(this).find(settings.tag_class+' input').filter(function() {
@@ -165,6 +161,8 @@
 			};
 			
 		},
+		// TODO: decide what's best: method aproach or custom events aproach.
+		// this names are lame, avoiding colisions is great, but we can make this better
 		tagboxNewTagAppend: function(tag, settings){
 			return newTagAction.call(this,tag, settings, 'append');
 		},
@@ -263,10 +261,9 @@
 		}
 		
 		if ($.isFunction(dictionary)) {
-			dictionary = split_tags(dictionary.call(), settings);//.sort();
+			dictionary = split_tags(dictionary.call(), settings);
 		}
 		var results = [];
-		// var resultsString = "";
 		$.each(dictionary, function(i, tag) {
 			var item;
 			if(settings.dictionary_map) {
@@ -276,10 +273,8 @@
 			}
 			if (item.match(word)) {
 				results.push(tag);
-				// resultsString += item +', ';
 			};
 		});
-		// console.log(resultsString);
 		return results;
 	};
 
@@ -287,9 +282,6 @@
 		var value = ''+textfield.value;
 		// Find the tag in the dictionary
 		var results = search_in_dictionary(value, settings.autocomplete,settings);
-		// console.clear();
-		// console.info('autocomplete', '"'+value+'"');
-		// console.debug('results',results);
 		if(settings.autocomplete_action == 'selection') {
 			if (results.length) {
 				var regx = search_regx(value,settings),
@@ -300,7 +292,6 @@
 					current_index = sel.text.length;
 				}
 				value = value.substr(0,current_index);
-				// console.dir(results);
 				//Default autocomplete
 				var result;
 				if(settings.dictionary_map) {
@@ -326,10 +317,6 @@
 			}
 		} else if(settings.autocomplete_action == 'list') {
 			if (results.length) {
-				// console.clear();
-				// console.info('autocomplete:'+value);
-				// console.dir(results);
-				// console.dir(results);
 				var $field = $(textfield),
 					pos = $field.offset(),
 					$tag = $field.parents(settings.tag_class),
@@ -474,10 +461,8 @@
 		if (e.keyCode == 9 || e.keyCode == 13) {
 			// if TAB or ENTER
 			var settings = get_settings(e.target); // only get settings here for performance
-			// console.info('TAB or ENTER')
 			// if autocomplete list
 			var $choosen = $('#tagbox_autocomplete_sugestions .current');
-			// console.info($choosen);
 			if(settings.autocomplete_action == 'list' && $choosen.size() !== 0) {
 				list_complete(this,$choosen,settings);
 			}
@@ -509,7 +494,6 @@
 		var result = '',
 			item = $.data($choosen.get(0),'item'),
 			$elm = $(elem);
-		// console.info('item',item);
 		if(settings.dictionary_map) {
 			result = settings.dictionary_map(item);
 		} else {
@@ -521,17 +505,11 @@
 	};
 	
 	function internal_keyup(e,force_autocomplete) {
-		// if(e.keyCode) {
-		// 	console.info('keyCode',e.keyCode);
-		// }
 		var target = $(this),
 			value = this.value,
 			settings = get_settings(e.target);
 		//autocomplete
 		if ( settings.autocomplete  && value.length && ( force_autocomplete || String.fromCharCode(e.keyCode).match(/[a-z0-9@._-]/gim) || e.keyCode == 8) ) {
-			// if (settings.autocomplete.url) {
-			// 	// TODO: someting
-			// };
 			autocomplete(this,settings);
 		};
 		
@@ -568,7 +546,11 @@
 			
 		}
 		
-		// TODO: close tag and create a new one on closed separators someting like if( /^"[^"]+"$/.test(value) && (settings.grouping).test(String.fromCharCode(e.keyCode)) )
+		// TODO: split tag when user types the 'closing' separator
+		// Case: .tagbox({separator:/ /,grouping:'"'})
+		// Steps: A) user types: ["testing grouping] B) user types characters " a b c in sequence
+		// Today: ["testing grouping"abc]
+		// Expected: ["testing grouping"] [abc]
 		
 	};
 	
@@ -605,7 +587,6 @@
 	function new_tag(text, settings) {
 		var text = text || "",
 			$tag = $(settings.tag).clone(true); // Clone with events
-		// $.data($tag.get(0),'settings',settings);
 		$tag.find('input')
 			.siblings('span').html(sanitize(text))
 			.end().val(text).attr('name', settings.name);
