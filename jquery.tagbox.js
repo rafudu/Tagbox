@@ -495,12 +495,12 @@
 		}
 		if (e.keyCode == 38 || e.keyCode == 40) {
 			// if UP or DOWN
-			var way = e.keyCode === 38 ? 'prev':'next',
+			var way = e.keyCode === 38 ? 'prevAll':'nextAll',
 				$curr = $('#tagbox_autocomplete_sugestions .current');
 			if($curr.size()==0) {
 				$('#tagbox_autocomplete_sugestions .item:'+(e.keyCode === 38 ? 'last':'first')).addClass('current');
 			} else {
-				$curr.removeClass('current')[way]('.item').addClass('current');
+				$curr.removeClass('current')[way]('.item:first').addClass('current');
 			}
 		}
 	};
