@@ -88,7 +88,10 @@
 					})
 					.bind('remove_tag', function(e, text,avoid_recursion) {
 						if(!avoid_recursion) {
-							remove_tag(find_tag.call(this, text), settings);
+							var found = find_tag.call(this, text);
+							if(found.size()) {
+								remove_tag(found.get(0), settings);
+							}
 						}
 					})
 					.bind('toggle_tag', function(e, text) {
