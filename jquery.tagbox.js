@@ -86,6 +86,11 @@
 					.bind('add_tag', function(e, text) {
 						$(this).trigger('click', text);
 					})
+					.bind('remove_tag', function(e, text,avoid_recursion) {
+						if(!avoid_recursion) {
+							remove_tag(find_tag.call(this, text), settings);
+						}
+					})
 					.bind('toggle_tag', function(e, text) {
 						suggestion = find_suggestion(text,settings);
 						if(find_tag.call(this, text).length){
@@ -186,19 +191,19 @@
 	};
 	
 	function remove_tag(tag, settings) {
-		if($(settings.box).trigger('remove_tag',tag) !== false) {
-			if (settings.fx) {
-				// animate if settings.fx
-				$(tag).animate(
-					{width: 'hide'},
-					'fast',
-					function() {
-						$(tag).remove();
-					});
-			}else {
-				// or just remove, without animation
-				$(tag).remove();
-			}
+		$(settings.box).trigger('remove_tag',[tag,true])
+		$(tag).find('input').remove();
+		if (settings.fx) {
+			// animate if settings.fx
+			$(tag).animate(
+				{width: 'hide'},
+				'fast',
+				function() {
+					$(tag).remove();
+				});
+		}else {
+			// or just remove, without animation
+			$(tag).remove();
 		}
 	}
 	
@@ -349,7 +354,7 @@
 				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px'})
 				$suggestions.empty().append(html);
 				if(insert) {
-					$suggestions.insertAfter($tag.get(0));
+					$suggestions.prependTo(settings.box);
 				}
 				$.data($suggestions.get(0),'textfield',textfield);
 				$('#tagbox_autocomplete_sugestions .item').hover(function() {
