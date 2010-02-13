@@ -5,7 +5,7 @@ Tagbox is a simple tagging plugin for jQuery.
 #Usage
 
 
-(Examples at: [http://saynotofastfood.info/tagbox/examples](http://saynotofastfood.info/tagbox/examples))
+(Examples at: [http://irae.pro.br/code/tagbox/examples/](http://irae.pro.br/code/tagbox/examples/))
 
 [Download](http://cloud.github.com/downloads/rafudu/Tagbox/tagbox.1.0.1.zip) the plugin and include jquery.tagbox.js and tags.css in your page to get started.
 
