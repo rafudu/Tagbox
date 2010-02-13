@@ -66,6 +66,7 @@ span.tag label span {
 	filter:alpha(opacity=90);
 	font-family: "Lucida Grande","Verdana";
 	font-size:11px;
+	text-align:left;
 }
 #tagbox_autocomplete_sugestions ul {
 	padding-left:0;

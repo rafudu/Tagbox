@@ -257,8 +257,29 @@
 		return result;
 	};
 
+	var cMap = {},
+		reMap = '';
+	(function(){
+		var cs,c,i,a,aMap = {A:'ÁÀÂÃ',E:'ÉÈÊ',I:'ÍÌÎ',O:'ÓÒÔÕ',U:'ÚÙÛ',N:'Ñ',C:'Ç'};
+		for(a in aMap) {
+			cs = aMap[a].split('');
+			for(i=0;i<cs.length;i++) {
+				c = cs[i];
+				reMap+=c; reMap+=c.toLowerCase();
+				cMap[c] = a; cMap[c.toLowerCase()] = a.toLowerCase();
+			}
+		}
+	})();
+	var charRe = new RegExp('['+reMap+']');
+
+	function replaceChars(word) {
+		return word.replace(charRe,function(char,type){
+			var c=char;try{c=cMap[char];}catch(e){}return c;
+		});
+	};
+	
 	function search_regx(word,settings) {
-		return new RegExp("^"+(settings.grouping?settings.grouping+'?':'')+word,'i');
+		return new RegExp("^"+(settings.grouping?settings.grouping+'?':'')+replaceChars(word),'i');
 	};
 
 	function search_in_dictionary (word, dictionary,settings) {
@@ -278,6 +299,7 @@
 			} else {
 				item = tag;
 			}
+			item = replaceChars(item);
 			if (item.match(word)) {
 				results.push(tag);
 			};
@@ -356,7 +378,7 @@
 				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px'})
 				$suggestions.empty().append(html);
 				if(insert) {
-					$suggestions.prependTo(settings.box);
+					$suggestions.prependTo('body');
 				}
 				$.data($suggestions.get(0),'textfield',textfield);
 				$('#tagbox_autocomplete_sugestions .item').hover(function() {
