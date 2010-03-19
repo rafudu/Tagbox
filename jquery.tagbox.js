@@ -70,17 +70,10 @@
 
 				$box
 					.click(function(e, text) {
+						console.info('box click');
 						// If you click the tagbox, a new tag is created
 						if(e.target == this) {
 							$(this).tagboxNewTagAppend(text, settings).find(settings.tag_class+':last input').focus();
-						} else if ($(e.target).is('#tagbox_autocomplete_sugestions .item')) {
-							e.preventDefault();e.stopPropagation();
-							if($('#tagbox_autocomplete_sugestions').size()) {
-								var $choosen = $(e.target),
-									textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
-								list_complete(textfield,$choosen,settings);
-							}
-							return false;
 						}
 					})
 					.bind('add_tag', function(e, text) {
@@ -372,7 +365,18 @@
 					html = $listElems;
 				}
 				if($suggestions.size()===0) {
-					$suggestions = $('<div id="tagbox_autocomplete_sugestions"></div>');
+					$suggestions = $('<div id="tagbox_autocomplete_sugestions"></div>')
+						.click(function(e){
+							if(!$(e.target).is('.item')) {return;}
+							e.preventDefault();e.stopPropagation();
+							if($('#tagbox_autocomplete_sugestions').size()) {
+								var $choosen = $(e.target),
+									textfield = $.data($('#tagbox_autocomplete_sugestions').get(0),'textfield');
+								list_complete(textfield,$choosen,settings);
+							}
+							return false;
+						
+						});
 					insert = true;
 				}
 				$suggestions.css({position:'absolute',zIndex:300,top:(pos.top+$field.outerHeight())+'px', left:pos.left+'px'})
